@@ -24,10 +24,13 @@ fun HomeToolbar(
 	openSearch: () -> Unit,
 	openSettings: () -> Unit,
 	switchUsers: () -> Unit,
+	openSystemSettings: () -> Unit,
+	openAppList: () -> Unit,
 	userImage: String? = null,
 ) {
 	Toolbar {
 		ToolbarButtons {
+
 			IconButton(onClick = openSearch) {
 				Icon(
 					painter = painterResource(R.drawable.ic_search),
@@ -64,6 +67,20 @@ fun HomeToolbar(
 						contentDescription = stringResource(R.string.lbl_switch_user),
 					)
 				}
+			}
+
+			IconButton(onClick = openAppList) {
+				Icon(
+					painter = painterResource(R.drawable.ic_apps),
+					contentDescription = "Apps",
+				)
+			}
+
+			IconButton(onClick = openSystemSettings) {
+				Icon(
+					painter = painterResource(R.drawable.ic_system_settings),
+					contentDescription = "System settings",
+				)
 			}
 		}
 	}
