@@ -50,6 +50,7 @@ import org.jellyfin.androidtv.util.apiclient.ReportingHelper
 import org.jellyfin.androidtv.util.coil.CoilTimberLogger
 import org.jellyfin.androidtv.util.coil.createCoilConnectivityChecker
 import org.jellyfin.androidtv.util.sdk.SdkPlaybackHelper
+import org.jellyfin.androidtv.viewmodel.AppListViewModel
 import org.jellyfin.sdk.android.androidDevice
 import org.jellyfin.sdk.api.client.HttpClientOptions
 import org.jellyfin.sdk.createJellyfin
@@ -124,6 +125,7 @@ val appModule = module {
 	viewModel { ScreensaverViewModel(get()) }
 	viewModel { SearchViewModel(get()) }
 	viewModel { DreamViewModel(get(), get(), get(), get(), get()) }
+	viewModel { AppListViewModel(get()) }
 
 	single { BackgroundService(get(), get(), get(), get(), get()) }
 

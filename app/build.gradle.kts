@@ -1,5 +1,6 @@
 plugins {
 	id("com.android.application")
+	id("org.jetbrains.kotlin.kapt")
 	kotlin("android")
 	alias(libs.plugins.kotlin.serialization)
 	alias(libs.plugins.kotlin.compose)
@@ -29,6 +30,11 @@ android {
 
 	compileOptions {
 		isCoreLibraryDesugaringEnabled = true
+	}
+
+	kapt {
+		correctErrorTypes = true
+		useBuildCache = true
 	}
 
 	buildTypes {
@@ -123,7 +129,6 @@ dependencies {
 	implementation(libs.androidx.cardview)
 	implementation(libs.androidx.startup)
 	implementation(libs.bundles.androidx.compose)
-	implementation("androidx.compose.material3:material3:1.3.2")
 
 	// Dependency Injection
 	implementation(libs.bundles.koin)
@@ -159,4 +164,7 @@ dependencies {
 	testImplementation(libs.kotest.runner.junit5)
 	testImplementation(libs.kotest.assertions)
 	testImplementation(libs.mockk)
+
+
+	implementation("androidx.compose.material3:material3:1.3.2")
 }

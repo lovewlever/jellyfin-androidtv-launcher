@@ -34,6 +34,7 @@ import org.jellyfin.androidtv.ui.shared.TopSlideAppList
 import org.jellyfin.androidtv.ui.shared.toolbar.HomeToolbar
 import org.jellyfin.androidtv.ui.startup.StartupActivity
 import org.jellyfin.androidtv.util.ImageHelper
+import org.jellyfin.androidtv.viewmodel.AppListViewModel
 import org.koin.android.ext.android.inject
 
 class HomeFragment : Fragment() {
@@ -47,6 +48,8 @@ class HomeFragment : Fragment() {
 	private val navigationRepository by inject<NavigationRepository>()
 	private val mediaManager by inject<MediaManager>()
 	private val imageHelper by inject<ImageHelper>()
+
+	private val appListViewModel by inject<AppListViewModel>()
 	private var showTopSlideAppList by mutableStateOf(false)
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -66,12 +69,14 @@ class HomeFragment : Fragment() {
 				openAppList = { showTopSlideAppList = true },
 				userImage = userImage,
 			)
+
+			JellyfinTheme {
+				TopSlideAppList(showTopSlideAppList, onDismissRequest = { showTopSlideAppList = false }, appListVM = appListViewModel)
+			}
 		}
 
 		binding.contentCompose.setContent {
-			JellyfinTheme {
-				TopSlideAppList(showTopSlideAppList, onDismissRequest = { showTopSlideAppList = false })
-			}
+
 		}
 
 		return binding.root
