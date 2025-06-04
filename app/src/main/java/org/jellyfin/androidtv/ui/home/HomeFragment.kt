@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -25,16 +22,13 @@ import org.jellyfin.androidtv.auth.repository.SessionRepository
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.data.repository.NotificationsRepository
 import org.jellyfin.androidtv.databinding.FragmentHomeBinding
-import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.navigation.ActivityDestinations
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.ui.playback.MediaManager
-import org.jellyfin.androidtv.ui.shared.TopSlideAppList
 import org.jellyfin.androidtv.ui.shared.toolbar.HomeToolbar
 import org.jellyfin.androidtv.ui.startup.StartupActivity
 import org.jellyfin.androidtv.util.ImageHelper
-import org.jellyfin.androidtv.viewmodel.AppListViewModel
 import org.koin.android.ext.android.inject
 
 class HomeFragment : Fragment() {
@@ -49,9 +43,6 @@ class HomeFragment : Fragment() {
 	private val mediaManager by inject<MediaManager>()
 	private val imageHelper by inject<ImageHelper>()
 
-	private val appListViewModel by inject<AppListViewModel>()
-	private var showTopSlideAppList by mutableStateOf(false)
-
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		_binding = FragmentHomeBinding.inflate(inflater, container, false)
 
@@ -65,18 +56,9 @@ class HomeFragment : Fragment() {
 				openSearch = { navigationRepository.navigate(Destinations.search()) },
 				openSettings = { startActivity(ActivityDestinations.userPreferences(context)) },
 				switchUsers = { switchUser() },
-				openSystemSettings = { openSystemSettings() },
-				openAppList = { showTopSlideAppList = true },
 				userImage = userImage,
 			)
 		}
-
-		binding.contentCompose.setContent {
-			JellyfinTheme {
-				TopSlideAppList(showTopSlideAppList, onDismissRequest = { showTopSlideAppList = false }, appListVM = appListViewModel)
-			}
-		}
-
 		return binding.root
 	}
 
@@ -94,13 +76,6 @@ class HomeFragment : Fragment() {
 			}
 			.launchIn(viewLifecycleOwner.lifecycleScope)
 
-		requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-			override fun handleOnBackPressed() {
-				if (showTopSlideAppList) {
-					showTopSlideAppList = false
-				}
-			}
-		})
 	}
 
 	override fun onDestroyView() {
@@ -121,9 +96,5 @@ class HomeFragment : Fragment() {
 
 		activity?.startActivity(selectUserIntent)
 		activity?.finishAfterTransition()
-	}
-
-	private fun openSystemSettings() {
-		startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
 	}
 }

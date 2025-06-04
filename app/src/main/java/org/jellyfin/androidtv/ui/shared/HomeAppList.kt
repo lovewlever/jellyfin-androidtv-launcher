@@ -1,18 +1,12 @@
 package org.jellyfin.androidtv.ui.shared
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,10 +21,12 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,169 +44,163 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.viewmodel.AppListViewModel
+import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopSlideAppList(
-	show: Boolean,
-	onDismissRequest: () -> Unit,
-	appListVM: AppListViewModel,
+	showTopSlideAppList: MutableState<Boolean>,
+	appListVM: AppListViewModel = koinInject<AppListViewModel>(),
 ) {
-
-	AnimatedVisibility(show) {
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.background(Color.Black.copy(alpha = 0.6f))
-				.pointerInput(true, block = { detectTapGestures() })
-		) {
-
+	if (showTopSlideAppList.value) {
+		var isActiveClose by remember { mutableStateOf(false) }
+		val context = LocalContext.current
+		val owner = LocalLifecycleOwner.current
+		LaunchedEffect(true) {
+			(context as ComponentActivity).onBackPressedDispatcher.addCallback(owner, object : OnBackPressedCallback(true) {
+				override fun handleOnBackPressed() {
+					if (showTopSlideAppList.value) {
+						isActiveClose = true
+					}
+				}
+			})
 		}
-	}
-	Box(modifier = Modifier.fillMaxSize()) {
-		AnimatedVisibility(
-			visible = show,
-			enter = slideInVertically(
-				initialOffsetY = { -it },
-				//animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-			),
-			exit = slideOutVertically(
-				targetOffsetY = { -it },
-				//animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-			),
-			modifier = Modifier.align(Alignment.TopCenter)
-		) {
+		AnyPopDialog(
+			isActiveClose = isActiveClose,
+			onDismiss = { showTopSlideAppList.value = false },
+			properties = AnyPopDialogProperties(direction = DirectionState.TOP)) {
 			val context = LocalContext.current
 			LaunchedEffect(true) {
 				appListVM.queryAllApps()
 			}
 			val rowCount = 2
-			Surface(
-				color = Color(0xFF171717),
-				tonalElevation = 8.dp,
-				shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(250.dp)
-			) {
-				LazyHorizontalGrid(
-					rows = GridCells.Fixed(rowCount), modifier = Modifier
-						.fillMaxSize()
-						.padding(vertical = 8.dp)
-						.focusable(true)
-						.focusGroup()
-				) {
-					itemsIndexed(appListVM.appList) { index, item ->
-						Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp).let {
-							if (index == 0 || index == 1) it.padding(start = 8.dp)
-							else if (index == (20 - 1) || index == (20 - 2)) it.padding(end = 8.dp) else it
-						}) {
-							val focusRequester = remember { FocusRequester() }
-							var pressed by remember { mutableStateOf(false) }
-							val scaleAnim by animateFloatAsState(targetValue = if (pressed) 1.15f else 1f, label = "")
-							val shapeRoundedDp by animateDpAsState(targetValue = if (pressed) 24.dp else 16.dp, label = "")
-							if (index == 0) {
-								LaunchedEffect(Unit) {
-									focusRequester.requestFocus()
-								}
-							}
-							Card(
-								onClick = {
-									//focusIndex = index
-									//focusRequester.requestFocus()
-								},
-								modifier = Modifier
-									.widthIn(min = 130.dp)
-									.onFocusChanged { state ->
-										pressed = state.isFocused
-									}
-									.onKeyEvent { keyEvent ->
-										if (keyEvent.key == Key.Back || keyEvent.key == Key.Escape) {
-											onDismissRequest()
-											true
-										}
-										if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
-											val intent = context.packageManager.getLeanbackLaunchIntentForPackage(item.pkgName)
-											val intent2 = context.packageManager.getLaunchIntentForPackage(item.pkgName)
 
-											if (intent != null) {
-												context.startActivity(intent)
-											} else if (intent2 != null) {
-												context.startActivity(intent2)
-											}
-											onDismissRequest()
-											//focusRequester.requestFocus()
-											true
-										} else {
-											false
-										}
+
+				Surface(
+					color = Color(0xFF171717),
+					tonalElevation = 8.dp,
+					shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(250.dp)
+				) {
+					LazyHorizontalGrid(
+						rows = GridCells.Fixed(rowCount), modifier = Modifier
+							.fillMaxSize()
+							.padding(vertical = 8.dp)
+							.focusable(true)
+							.focusGroup()
+					) {
+						itemsIndexed(appListVM.appList) { index, item ->
+							Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp).let {
+								if (index == 0 || index == 1) it.padding(start = 8.dp)
+								else if (index == (20 - 1) || index == (20 - 2)) it.padding(end = 8.dp) else it
+							}) {
+								val focusRequester = remember { FocusRequester() }
+								var pressed by remember { mutableStateOf(false) }
+								val scaleAnim by animateFloatAsState(targetValue = if (pressed) 1.15f else 1f, label = "")
+								val shapeRoundedDp by animateDpAsState(targetValue = if (pressed) 24.dp else 16.dp, label = "")
+								if (index == 0) {
+									LaunchedEffect(Unit) {
+										focusRequester.requestFocus()
 									}
-									.focusRequester(focusRequester)
-									.focusable()
-									.scale(scaleAnim)
-								/*.focusable(true)
-								.let {
-									if (focusIndex == index) it.focusRequester(focusRequester) else it
 								}
-								.onFocusChanged { focusState ->
-									Timber.d("\"FOCUS: \": ${index}; ${focusState.isFocused}")
-								},*/
-								/*elevation = CardDefaults.cardElevation(
-									defaultElevation = 12.dp,
-									focusedElevation = 24.dp,
-									pressedElevation = 24.dp
-								)*/,
-								colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
-								shape = RoundedCornerShape(shapeRoundedDp)
-							) {
-								Spacer(modifier = Modifier.height(12.dp))
-								item.icon?.toBitmap()?.asImageBitmap()?.let {
-									Image(
+								Card(
+									onClick = {
+										//focusIndex = index
+										//focusRequester.requestFocus()
+									},
+									modifier = Modifier
+										.widthIn(min = 130.dp)
+										.onFocusChanged { state ->
+											pressed = state.isFocused
+										}
+										.onKeyEvent { keyEvent ->
+											if (keyEvent.key == Key.Back || keyEvent.key == Key.Escape) {
+												isActiveClose = true
+												true
+											}
+											if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
+												val intent = context.packageManager.getLeanbackLaunchIntentForPackage(item.pkgName)
+												val intent2 = context.packageManager.getLaunchIntentForPackage(item.pkgName)
+
+												if (intent != null) {
+													context.startActivity(intent)
+												} else if (intent2 != null) {
+													context.startActivity(intent2)
+												}
+												isActiveClose = true
+												//focusRequester.requestFocus()
+												true
+											} else {
+												false
+											}
+										}
+										.focusRequester(focusRequester)
+										.focusable()
+										.scale(scaleAnim)
+									/*.focusable(true)
+									.let {
+										if (focusIndex == index) it.focusRequester(focusRequester) else it
+									}
+									.onFocusChanged { focusState ->
+										Timber.d("\"FOCUS: \": ${index}; ${focusState.isFocused}")
+									},*/
+									/*elevation = CardDefaults.cardElevation(
+										defaultElevation = 12.dp,
+										focusedElevation = 24.dp,
+										pressedElevation = 24.dp
+									)*/,
+									colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
+									shape = RoundedCornerShape(shapeRoundedDp)
+								) {
+									Spacer(modifier = Modifier.height(12.dp))
+									item.icon?.toBitmap()?.asImageBitmap()?.let {
+										Image(
+											modifier = Modifier
+												.align(Alignment.CenterHorizontally)
+												.weight(1f),
+											bitmap = it,
+											contentDescription = ""
+										)
+									} ?: Image(
 										modifier = Modifier
 											.align(Alignment.CenterHorizontally)
 											.weight(1f),
-										bitmap = it,
+										painter = painterResource(id = R.drawable.ic_apps),
 										contentDescription = ""
 									)
-								} ?: Image(
-									modifier = Modifier
-										.align(Alignment.CenterHorizontally)
-										.weight(1f),
-									painter = painterResource(id = R.drawable.ic_apps),
-									contentDescription = ""
-								)
 
-								Spacer(modifier = Modifier.height(4.dp))
-								Text(
-									text = item.appName,
-									fontSize = 14.sp,
-									modifier = Modifier
-										.align(Alignment.CenterHorizontally)
-										.width(120.dp),
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis,
-									textAlign = TextAlign.Center,
-									color = Color.White
-								)
-								Spacer(modifier = Modifier.height(12.dp))
+									Spacer(modifier = Modifier.height(4.dp))
+									Text(
+										text = item.appName,
+										fontSize = 14.sp,
+										modifier = Modifier
+											.align(Alignment.CenterHorizontally)
+											.width(120.dp),
+										maxLines = 1,
+										overflow = TextOverflow.Ellipsis,
+										textAlign = TextAlign.Center,
+										color = Color.White
+									)
+									Spacer(modifier = Modifier.height(12.dp))
+								}
 							}
 						}
 					}
+
 				}
 
-			}
 		}
 	}
 
