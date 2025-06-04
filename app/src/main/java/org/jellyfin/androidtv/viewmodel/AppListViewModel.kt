@@ -24,7 +24,8 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
 				val context = getApplication<Application>()
 				// 查询所有带图标的app
 				val apps = getLaunchableApps()
-				if (apps.size != appList.size) {
+				Timber.d("queryAllApps: ${apps.size}; ${appList.size + 1}")
+				if (apps.size != appList.size + 1) {
 					appList.clear()
 					for (app in apps) {
 						val packageName = app.activityInfo.packageName

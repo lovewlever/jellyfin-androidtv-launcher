@@ -79,11 +79,6 @@ fun TopSlideAppList(
 
 		}
 	}
-	val context = LocalContext.current
-	LaunchedEffect(true) {
-		appListVM.queryAllApps()
-	}
-
 	Box(modifier = Modifier.fillMaxSize()) {
 		AnimatedVisibility(
 			visible = show,
@@ -97,6 +92,10 @@ fun TopSlideAppList(
 			),
 			modifier = Modifier.align(Alignment.TopCenter)
 		) {
+			val context = LocalContext.current
+			LaunchedEffect(true) {
+				appListVM.queryAllApps()
+			}
 			val rowCount = 2
 			Surface(
 				color = Color(0xFF171717),
