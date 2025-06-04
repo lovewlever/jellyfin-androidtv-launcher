@@ -69,14 +69,12 @@ class HomeFragment : Fragment() {
 				openAppList = { showTopSlideAppList = true },
 				userImage = userImage,
 			)
-
-			JellyfinTheme {
-				TopSlideAppList(showTopSlideAppList, onDismissRequest = { showTopSlideAppList = false }, appListVM = appListViewModel)
-			}
 		}
 
 		binding.contentCompose.setContent {
-
+			JellyfinTheme {
+				TopSlideAppList(showTopSlideAppList, onDismissRequest = { showTopSlideAppList = false }, appListVM = appListViewModel)
+			}
 		}
 
 		return binding.root
