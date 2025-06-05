@@ -130,7 +130,7 @@ fun TopSlideAppList(
 												isActiveClose = true
 												true
 											}
-											if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyUp) {
+											if ((keyEvent.key == Key.Enter || keyEvent.key == Key.DirectionCenter) && keyEvent.type == KeyEventType.KeyUp) {
 												val intent = context.packageManager.getLeanbackLaunchIntentForPackage(item.pkgName)
 												val intent2 = context.packageManager.getLaunchIntentForPackage(item.pkgName)
 

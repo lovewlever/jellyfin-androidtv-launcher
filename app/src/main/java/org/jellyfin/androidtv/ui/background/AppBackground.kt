@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.background
 
+import android.graphics.Bitmap.Config
 import android.graphics.drawable.ColorDrawable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.snap
@@ -21,6 +22,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ImageBitmapConfig
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +30,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.scale
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.koin.compose.koinInject
@@ -41,7 +44,7 @@ private fun AppThemeBackground() {
 		attributes.recycle()
 
 		if (drawable is ColorDrawable) drawable.toBitmap(1, 1).asImageBitmap()
-		else drawable?.toBitmap()?.asImageBitmap()
+		else drawable?.toBitmap(config = Config.RGB_565)?.scale(1920, 1080, true)?.asImageBitmap()
 	}
 
 	if (themeBackground != null) {
