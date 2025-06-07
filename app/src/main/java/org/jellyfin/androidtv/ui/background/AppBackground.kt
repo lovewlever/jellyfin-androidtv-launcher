@@ -68,21 +68,30 @@ private fun AppThemeBackground() {
 		}
 	}
 
-	if (themeBackground != null) {
-		Image(
-			bitmap = themeBackground!!,
-			contentDescription = null,
-			alignment = Alignment.Center,
-			contentScale = ContentScale.Crop,
-			modifier = Modifier.fillMaxSize().customBlur()
-		)
-	} else {
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.background(Color.Black)
-		)
+	AnimatedContent(
+		targetState = themeBackground,
+		transitionSpec = {
+			val duration = (BackgroundService.TRANSITION_DURATION.inWholeMilliseconds / 2).toInt()
+			fadeIn(tween(durationMillis = duration)) togetherWith fadeOut(snap(delayMillis = duration))
+		},) {
+		if (it != null) {
+			Image(
+				bitmap = it,
+				contentDescription = null,
+				alignment = Alignment.Center,
+				contentScale = ContentScale.Crop,
+				modifier = Modifier.fillMaxSize().customBlur()
+			)
+		} else {
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(Color.Black)
+			)
+		}
 	}
+
+
 }
 
 @Composable

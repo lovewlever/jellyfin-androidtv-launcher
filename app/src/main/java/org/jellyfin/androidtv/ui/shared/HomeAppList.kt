@@ -8,11 +8,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -78,128 +81,125 @@ fun TopSlideAppList(
 		AnyPopDialog(
 			isActiveClose = isActiveClose,
 			onDismiss = { showTopSlideAppList.value = false },
-			properties = AnyPopDialogProperties(direction = DirectionState.TOP)) {
+			properties = AnyPopDialogProperties(direction = DirectionState.TOP)
+		) {
 			val context = LocalContext.current
 			LaunchedEffect(true) {
 				appListVM.queryAllApps()
 			}
-			val rowCount = 2
-
-
-				Surface(
-					color = Color(0xFF171717),
-					tonalElevation = 8.dp,
-					shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
-					modifier = Modifier
-						.fillMaxWidth()
-						.height(250.dp)
+			Surface(
+				color = Color(0xFF171717),
+				tonalElevation = 8.dp,
+				shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(220.dp)
+			) {
+				LazyHorizontalGrid(
+					rows = GridCells.Fixed(2), modifier = Modifier
+						.fillMaxSize()
+						.padding(vertical = 8.dp)
+						.focusable(true)
+						.focusGroup()
 				) {
-					LazyHorizontalGrid(
-						rows = GridCells.Fixed(rowCount), modifier = Modifier
-							.fillMaxSize()
-							.padding(vertical = 8.dp)
-							.focusable(true)
-							.focusGroup()
-					) {
-						itemsIndexed(appListVM.appList) { index, item ->
-							Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp).let {
-								if (index == 0 || index == 1) it.padding(start = 8.dp)
-								else if (index == (20 - 1) || index == (20 - 2)) it.padding(end = 8.dp) else it
-							}) {
-								val focusRequester = remember { FocusRequester() }
-								var pressed by remember { mutableStateOf(false) }
-								val scaleAnim by animateFloatAsState(targetValue = if (pressed) 1.15f else 1f, label = "")
-								val shapeRoundedDp by animateDpAsState(targetValue = if (pressed) 24.dp else 16.dp, label = "")
-								if (index == 0) {
-									LaunchedEffect(Unit) {
-										focusRequester.requestFocus()
-									}
+					itemsIndexed(appListVM.appList) { index, item ->
+						Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp).let {
+							if (index == 0 || index == 1) it.padding(start = 8.dp)
+							else if (index == (20 - 1) || index == (20 - 2)) it.padding(end = 8.dp) else it
+						}) {
+							val focusRequester = remember { FocusRequester() }
+							var pressed by remember { mutableStateOf(false) }
+							val scaleAnim by animateFloatAsState(targetValue = if (pressed) 1.12f else 1f, label = "")
+							val shapeRoundedDp by animateDpAsState(targetValue = if (pressed) 24.dp else 16.dp, label = "")
+							if (index == 0) {
+								LaunchedEffect(Unit) {
+									focusRequester.requestFocus()
 								}
-								Card(
-									onClick = {
-										//focusIndex = index
-										//focusRequester.requestFocus()
-									},
-									modifier = Modifier
-										.widthIn(min = 130.dp)
-										.onFocusChanged { state ->
-											pressed = state.isFocused
-										}
-										.onKeyEvent { keyEvent ->
-											if (keyEvent.key == Key.Back || keyEvent.key == Key.Escape) {
-												isActiveClose = true
-												true
-											}
-											if ((keyEvent.key == Key.Enter || keyEvent.key == Key.DirectionCenter) && keyEvent.type == KeyEventType.KeyUp) {
-												val intent = context.packageManager.getLeanbackLaunchIntentForPackage(item.pkgName)
-												val intent2 = context.packageManager.getLaunchIntentForPackage(item.pkgName)
-
-												if (intent != null) {
-													context.startActivity(intent)
-												} else if (intent2 != null) {
-													context.startActivity(intent2)
-												}
-												isActiveClose = true
-												//focusRequester.requestFocus()
-												true
-											} else {
-												false
-											}
-										}
-										.focusRequester(focusRequester)
-										.focusable()
-										.scale(scaleAnim)
-									/*.focusable(true)
-									.let {
-										if (focusIndex == index) it.focusRequester(focusRequester) else it
+							}
+							Card(
+								onClick = {
+									//focusIndex = index
+									//focusRequester.requestFocus()
+								},
+								modifier = Modifier
+									//.widthIn(min = 140.dp)
+									.onFocusChanged { state ->
+										pressed = state.isFocused
 									}
-									.onFocusChanged { focusState ->
-										Timber.d("\"FOCUS: \": ${index}; ${focusState.isFocused}")
-									},*/
-									/*elevation = CardDefaults.cardElevation(
-										defaultElevation = 12.dp,
-										focusedElevation = 24.dp,
-										pressedElevation = 24.dp
-									)*/,
-									colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
-									shape = RoundedCornerShape(shapeRoundedDp)
-								) {
-									Spacer(modifier = Modifier.height(12.dp))
+									.onKeyEvent { keyEvent ->
+										if (keyEvent.key == Key.Back || keyEvent.key == Key.Escape) {
+											isActiveClose = true
+											true
+										}
+										if ((keyEvent.key == Key.Enter || keyEvent.key == Key.DirectionCenter) && keyEvent.type == KeyEventType.KeyUp) {
+											val intent = context.packageManager.getLeanbackLaunchIntentForPackage(item.pkgName)
+											val intent2 = context.packageManager.getLaunchIntentForPackage(item.pkgName)
+
+											if (intent != null) {
+												context.startActivity(intent)
+											} else if (intent2 != null) {
+												context.startActivity(intent2)
+											}
+											isActiveClose = true
+											//focusRequester.requestFocus()
+											true
+										} else {
+											false
+										}
+									}
+									.focusRequester(focusRequester)
+									.focusable()
+									.scale(scaleAnim)
+								/*.focusable(true)
+								.let {
+									if (focusIndex == index) it.focusRequester(focusRequester) else it
+								}
+								.onFocusChanged { focusState ->
+									Timber.d("\"FOCUS: \": ${index}; ${focusState.isFocused}")
+								},*/
+								/*elevation = CardDefaults.cardElevation(
+									defaultElevation = 12.dp,
+									focusedElevation = 24.dp,
+									pressedElevation = 24.dp
+								)*/,
+								colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
+								shape = RoundedCornerShape(shapeRoundedDp)
+							) {
+								Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
+									Spacer(modifier = Modifier.width(12.dp))
 									item.icon?.toBitmap()?.asImageBitmap()?.let {
 										Image(
 											modifier = Modifier
-												.align(Alignment.CenterHorizontally)
-												.weight(1f),
+												.size(50.dp),
 											bitmap = it,
 											contentDescription = ""
 										)
 									} ?: Image(
 										modifier = Modifier
-											.align(Alignment.CenterHorizontally)
-											.weight(1f),
+											.size(50.dp),
 										painter = painterResource(id = R.drawable.ic_apps),
 										contentDescription = ""
 									)
 
-									Spacer(modifier = Modifier.height(4.dp))
+									Spacer(modifier = Modifier.width(8.dp))
+
 									Text(
 										text = item.appName,
-										fontSize = 14.sp,
-										modifier = Modifier
-											.align(Alignment.CenterHorizontally)
-											.width(120.dp),
+										fontSize = 16.sp,
+										modifier = Modifier.width(100.dp),
 										maxLines = 1,
 										overflow = TextOverflow.Ellipsis,
-										textAlign = TextAlign.Center,
+										textAlign = TextAlign.Start,
 										color = Color.White
 									)
-									Spacer(modifier = Modifier.height(12.dp))
+									Spacer(modifier = Modifier.width(12.dp))
 								}
 							}
 						}
 					}
-
 				}
+
+			}
 
 		}
 	}
