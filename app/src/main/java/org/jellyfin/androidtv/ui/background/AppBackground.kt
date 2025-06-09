@@ -41,6 +41,8 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.data.service.BackgroundService
+import org.jellyfin.androidtv.ui.gqcustom.GQScreenCommon
+import org.jellyfin.androidtv.ui.gqcustom.customBlur
 import org.koin.compose.koinInject
 
 @Composable
@@ -65,7 +67,7 @@ private fun AppThemeBackground(splashScreenBackground: ImageBitmap? = null) {
 				val assetManager = context.assets
 				assetManager.open("default.webp").use { inputStream ->
 					val options = BitmapFactory.Options().apply {
-						inSampleSize = calculateInSampleSize(this, 1920, 1080)
+						inSampleSize = GQScreenCommon.calculateInSampleSize(this, 1920, 1080)
 					}
 					themeBackground = BitmapFactory.decodeStream(inputStream, null, options)?.asImageBitmap()
 				}
@@ -139,31 +141,4 @@ fun AppBackground(
 			}
 		}
 	}
-}
-
-@Composable
-fun Modifier.customBlur(blur: Dp = 10.dp): Modifier {
-	return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-		this.blur(blur)
-	} else {
-		this.hazeEffect(style = HazeStyle.Unspecified, block = {
-			this.blurEnabled = true
-			this.blurRadius = blur + 10.dp
-			this.backgroundColor = Color.White
-			this.noiseFactor = 0F
-		})
-	}
-}
-
-private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-	val (height: Int, width: Int) = options.run { outHeight to outWidth }
-	var inSampleSize = 1
-	if (height > reqHeight || width > reqWidth) {
-		val halfHeight: Int = height / 2
-		val halfWidth: Int = width / 2
-		while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-			inSampleSize *= 2
-		}
-	}
-	return inSampleSize
 }

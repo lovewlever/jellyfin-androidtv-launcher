@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jellyfin.androidtv.integration.dream.composable.DreamHost
 import org.jellyfin.androidtv.ui.ScreensaverViewModel
+import org.jellyfin.androidtv.ui.gqcustom.GQScreensaver
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -40,7 +41,8 @@ fun InAppScreensaver() {
 					screensaverViewModel.notifyInteraction(true)
 				}
 		) {
-			DreamHost()
+			// DreamHost()
+			GQScreensaver()
 		}
 	}
 }
