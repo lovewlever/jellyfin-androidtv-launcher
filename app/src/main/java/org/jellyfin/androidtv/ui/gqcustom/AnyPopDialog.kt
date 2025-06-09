@@ -1,5 +1,6 @@
-package org.jellyfin.androidtv.ui.shared
+package org.jellyfin.androidtv.ui.gqcustom
 
+import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
@@ -144,7 +145,7 @@ private fun DialogFullScreen(
                     attributes.type = dialogWindow.attributes.type
                     dialogWindow.attributes = attributes
                     // 修复Android10 - Android11出现背景全黑的情况
-                    dialogWindow.setBackgroundDrawableResource(android.R.color.transparent)
+                    dialogWindow.setBackgroundDrawableResource(R.color.transparent)
                     // 禁止Dialog跟随软键盘高度变化，用Compose提供的imePadding替代
                     dialogWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 

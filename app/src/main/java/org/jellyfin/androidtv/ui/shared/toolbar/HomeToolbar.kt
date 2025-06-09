@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import org.jellyfin.androidtv.R
@@ -24,7 +23,7 @@ import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
-import org.jellyfin.androidtv.ui.shared.TopSlideAppList
+import org.jellyfin.androidtv.ui.gqcustom.TopSlideAppList
 
 @Composable
 fun HomeToolbar(

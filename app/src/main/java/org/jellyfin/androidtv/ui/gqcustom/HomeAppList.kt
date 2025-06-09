@@ -1,4 +1,4 @@
-package org.jellyfin.androidtv.ui.shared
+package org.jellyfin.androidtv.ui.gqcustom
 
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -56,7 +55,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.viewmodel.AppListViewModel
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -11,7 +11,7 @@ import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.ui.base.Icon
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.button.IconButton
-import org.jellyfin.androidtv.ui.shared.TopSlideAppList
+import org.jellyfin.androidtv.ui.gqcustom.TopSlideAppList
 
 @Composable
 fun StartupToolbar(
