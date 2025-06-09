@@ -7,6 +7,12 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -18,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.auth.repository.SessionRepository
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.databinding.ActivityMainBinding
@@ -40,6 +47,7 @@ class MainActivity : FragmentActivity() {
 	private val userRepository by inject<UserRepository>()
 	private val screensaverViewModel by viewModel<ScreensaverViewModel>()
 	private val workManager by inject<WorkManager>()
+	private val serverRepository by inject<ServerRepository>()
 
 	private lateinit var binding: ActivityMainBinding
 
@@ -74,7 +82,17 @@ class MainActivity : FragmentActivity() {
 			}.launchIn(lifecycleScope)
 
 		binding = ActivityMainBinding.inflate(layoutInflater)
-		binding.background.setContent { AppBackground() }
+		binding.background.setContent {
+			val curSession = sessionRepository.currentSession.collectAsState()
+			var serverAddress by remember { mutableStateOf<String?>(null) }
+			LaunchedEffect(curSession.value) {
+				if (curSession.value != null) {
+					val server = serverRepository.getServer(curSession.value!!.serverId)
+					serverAddress = server?.address
+				}
+			}
+			AppBackground(serverAddress = serverAddress)
+		}
 		binding.screensaver.setContent { InAppScreensaver() }
 		setContentView(binding.root)
 	}

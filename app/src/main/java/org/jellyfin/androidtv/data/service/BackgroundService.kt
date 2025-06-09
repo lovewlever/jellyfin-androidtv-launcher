@@ -48,12 +48,14 @@ class BackgroundService(
 	// Current background data
 	private var _backgrounds = emptyList<ImageBitmap>()
 	private var _currentIndex = 0
+	private var _splashScreenBackground = MutableStateFlow<ImageBitmap?>(null)
 	private var _currentBackground = MutableStateFlow<ImageBitmap?>(null)
 	private var _blurBackground = MutableStateFlow(false)
 	private var _enabled = MutableStateFlow(true)
 	val currentBackground get() = _currentBackground.asStateFlow()
 	val blurBackground get() = _blurBackground.asStateFlow()
 	val enabled get() = _enabled.asStateFlow()
+	val splashScreenBackground get() = _splashScreenBackground
 
 	/**
 	 * Use all available backdrops from [baseItem] as background.
@@ -94,6 +96,17 @@ class BackgroundService(
 		val splashscreenUrl = api.imageApi.getSplashscreenUrl()
 
 		loadBackgrounds(setOf(splashscreenUrl))
+	}
+
+	fun setSplashScreenBitmap(serverAddress: String) {
+		scope.launch(Dispatchers.IO) {
+			val api = jellyfin.createApi(baseUrl = serverAddress)
+			val splashscreenUrl = api.imageApi.getSplashscreenUrl()
+			val bgImg = imageLoader.execute(
+				request = ImageRequest.Builder(context).data(splashscreenUrl).build()
+			).image?.toBitmap()?.asImageBitmap()
+			_splashScreenBackground.emit(bgImg)
+		}
 	}
 
 	private fun loadBackgrounds(backdropUrls: Set<String>) {

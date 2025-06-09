@@ -39,17 +39,22 @@ import dev.chrisbanes.haze.hazeEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.data.service.BackgroundService
 import org.koin.compose.koinInject
 
 @Composable
-private fun AppThemeBackground() {
+private fun AppThemeBackground(splashScreenBackground: ImageBitmap? = null) {
 	val context = LocalContext.current
 	var themeBackground by remember {
 		mutableStateOf<ImageBitmap?>(null)
 	}
 
-	LaunchedEffect(context.theme) {
+	LaunchedEffect(context.theme, key2 = splashScreenBackground) {
+		if (splashScreenBackground != null) {
+			themeBackground = splashScreenBackground
+			return@LaunchedEffect
+		}
 		withContext(Dispatchers.IO) {
 			val attributes = context.theme.obtainStyledAttributes(intArrayOf(R.attr.defaultBackground))
 			val drawable = attributes.getDrawable(0)
@@ -95,8 +100,10 @@ private fun AppThemeBackground() {
 }
 
 @Composable
-fun AppBackground() {
-	val backgroundService = koinInject<BackgroundService>()
+fun AppBackground(
+	backgroundService: BackgroundService = koinInject<BackgroundService>(),
+	serverAddress: String? = null
+) {
 	val currentBackground by backgroundService.currentBackground.collectAsState()
 	val blurBackground by backgroundService.blurBackground.collectAsState()
 	val enabled by backgroundService.enabled.collectAsState()
@@ -122,7 +129,13 @@ fun AppBackground() {
 						.then(if (blurBackground) Modifier.customBlur() else Modifier)
 				)
 			} else {
-				AppThemeBackground()
+				val splashScreenBackground by backgroundService.splashScreenBackground.collectAsState()
+				LaunchedEffect(serverAddress) {
+					if (serverAddress != null) {
+						backgroundService.setSplashScreenBitmap(serverAddress)
+					}
+				}
+				AppThemeBackground(splashScreenBackground)
 			}
 		}
 	}
