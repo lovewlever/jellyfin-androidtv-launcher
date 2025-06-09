@@ -114,6 +114,7 @@ dependencies {
 	// Android(x)
 	implementation(libs.androidx.core)
 	implementation(libs.androidx.activity)
+	implementation(libs.androidx.activity.compose)
 	implementation(libs.androidx.fragment)
 	implementation(libs.androidx.fragment.compose)
 	implementation(libs.androidx.leanback.core)
@@ -129,6 +130,7 @@ dependencies {
 	implementation(libs.androidx.cardview)
 	implementation(libs.androidx.startup)
 	implementation(libs.bundles.androidx.compose)
+	implementation(libs.accompanist.permissions)
 
 	// Dependency Injection
 	implementation(libs.bundles.koin)
