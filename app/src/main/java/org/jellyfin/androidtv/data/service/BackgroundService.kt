@@ -98,6 +98,7 @@ class BackgroundService(
 		loadBackgrounds(setOf(splashscreenUrl))
 	}
 
+
 	fun setSplashScreenBitmap(serverAddress: String) {
 		scope.launch(Dispatchers.IO) {
 			val api = jellyfin.createApi(baseUrl = serverAddress)

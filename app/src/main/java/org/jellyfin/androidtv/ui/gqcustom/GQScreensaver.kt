@@ -36,16 +36,16 @@ import kotlin.random.Random
 fun GQScreensaver() {
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
-	// 图片列表状态
+
 	val imageList = remember { mutableStateListOf<Bitmap>() }
 	LaunchedEffect(true) {
 		imageList.addAll(GQScreenCommon.loadImagesFromAssets(context))
 	}
-	// 当前显示的图片索引
+
 	var currentImageIndex by remember { mutableIntStateOf(0) }
 	var currentImagePreIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
-	// 自动切换图片
+
 	LaunchedEffect(Unit) {
 		while (true) {
 			if (imageList.isNotEmpty()) {
@@ -63,7 +63,7 @@ fun GQScreensaver() {
 		}
 	}
 
-	// 显示当前图片
+
 	if (imageList.isNotEmpty()) {
 		Box(
 			contentAlignment = Alignment.Center,
@@ -81,7 +81,7 @@ fun GQScreensaver() {
 					contentDescription = "",
 					modifier = Modifier
 						.fillMaxSize()
-						.customBlur(20.dp),
+						.customBlurCompatible(20.dp),
 					contentScale = ContentScale.Crop
 				)
 			}

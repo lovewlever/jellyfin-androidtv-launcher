@@ -1,8 +1,6 @@
 package org.jellyfin.androidtv.ui.background
 
-import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
@@ -22,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -31,32 +28,22 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeEffect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.R
-import org.jellyfin.androidtv.auth.repository.ServerRepository
 import org.jellyfin.androidtv.data.service.BackgroundService
-import org.jellyfin.androidtv.ui.gqcustom.GQScreenCommon
 import org.jellyfin.androidtv.ui.gqcustom.customBlur
 import org.koin.compose.koinInject
 
 @Composable
-private fun AppThemeBackground(splashScreenBackground: ImageBitmap? = null) {
+private fun AppThemeBackground() {
 	val context = LocalContext.current
 	var themeBackground by remember {
 		mutableStateOf<ImageBitmap?>(null)
 	}
 
-	LaunchedEffect(context.theme, key2 = splashScreenBackground) {
-		if (splashScreenBackground != null) {
-			themeBackground = splashScreenBackground
-			return@LaunchedEffect
-		}
+	LaunchedEffect(context.theme) {
 		withContext(Dispatchers.IO) {
 			val attributes = context.theme.obtainStyledAttributes(intArrayOf(R.attr.defaultBackground))
 			val drawable = attributes.getDrawable(0)
@@ -64,13 +51,7 @@ private fun AppThemeBackground(splashScreenBackground: ImageBitmap? = null) {
 			if (drawable is ColorDrawable) {
 				themeBackground = drawable.toBitmap(1, 1).asImageBitmap()
 			} else {
-				val assetManager = context.assets
-				assetManager.open("default.webp").use { inputStream ->
-					val options = BitmapFactory.Options().apply {
-						inSampleSize = GQScreenCommon.calculateInSampleSize(this, 1920, 1080)
-					}
-					themeBackground = BitmapFactory.decodeStream(inputStream, null, options)?.asImageBitmap()
-				}
+				themeBackground = drawable?.toBitmap()?.asImageBitmap()
 			}
 		}
 	}
@@ -131,13 +112,7 @@ fun AppBackground(
 						.then(if (blurBackground) Modifier.customBlur() else Modifier)
 				)
 			} else {
-				val splashScreenBackground by backgroundService.splashScreenBackground.collectAsState()
-				LaunchedEffect(serverAddress) {
-					if (serverAddress != null) {
-						backgroundService.setSplashScreenBitmap(serverAddress)
-					}
-				}
-				AppThemeBackground(splashScreenBackground)
+				AppThemeBackground()
 			}
 		}
 	}

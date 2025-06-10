@@ -47,7 +47,6 @@ class MainActivity : FragmentActivity() {
 	private val userRepository by inject<UserRepository>()
 	private val screensaverViewModel by viewModel<ScreensaverViewModel>()
 	private val workManager by inject<WorkManager>()
-	private val serverRepository by inject<ServerRepository>()
 
 	private lateinit var binding: ActivityMainBinding
 
@@ -83,15 +82,7 @@ class MainActivity : FragmentActivity() {
 
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		binding.background.setContent {
-			val curSession = sessionRepository.currentSession.collectAsState()
-			var serverAddress by remember { mutableStateOf<String?>(null) }
-			LaunchedEffect(curSession.value) {
-				if (curSession.value != null) {
-					val server = serverRepository.getServer(curSession.value!!.serverId)
-					serverAddress = server?.address
-				}
-			}
-			AppBackground(serverAddress = serverAddress)
+			AppBackground()
 		}
 		binding.screensaver.setContent { InAppScreensaver() }
 		setContentView(binding.root)

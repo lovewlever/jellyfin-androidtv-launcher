@@ -15,9 +15,18 @@ fun Modifier.customBlur(blur: Dp = 10.dp): Modifier {
 	return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
 		this.blur(blur)
 	} else {
+		this
+	}
+}
+
+@Composable
+fun Modifier.customBlurCompatible(blur: Dp = 10.dp): Modifier {
+	return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+		this.blur(blur)
+	} else {
 		this.hazeEffect(style = HazeStyle.Unspecified, block = {
 			this.blurEnabled = true
-			this.blurRadius = blur + 10.dp
+			this.blurRadius = blur
 			this.backgroundColor = Color.White
 			this.noiseFactor = 0F
 		})
