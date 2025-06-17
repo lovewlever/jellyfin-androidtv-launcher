@@ -1,0 +1,41 @@
+#include "DrogonConfig.h"
+#include <drogon/drogon.h>
+#include <HttpGQScreensaver.h>
+
+#include "ClientConfig.h"
+using namespace drogon;
+
+int main()
+{
+    // 读取配置文件
+    if (const auto i = DrogonConfig::getInstance().loadDrogonConfig(); i < 0)
+    {
+        return i;
+    }
+    // 启动DrogonServer
+
+    std::thread t{
+        []()
+        {
+            app().setLogPath("./")
+                    .setLogLevel(trantor::Logger::kInfo)
+                    .addListener("127.0.0.1", 8089)
+                    .setThreadNum(4)
+                    //.enableRunAsDaemon()
+                    .run();
+        }
+    };
+
+    std::thread cli{[] ()
+    {
+        ClientConfig::getInstance().loadClientConfig("config/client-config.yaml");
+        while (true)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            HttpGQScreensaver::newInstance()->queryScreensaverImageList();
+        }
+    }};
+    cli.detach();
+    t.join();
+    return 0;
+}
