@@ -14,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,8 +29,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.random.Random
 
 @Composable
@@ -46,21 +49,36 @@ fun GQScreensaver() {
 	var currentImagePreIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
 
-	LaunchedEffect(Unit) {
-		while (true) {
-			if (imageList.isNotEmpty()) {
-				currentImageIndex = Random.nextInt(imageList.size)
-				coroutineScope.launch {
-					animRotation.animateTo(5F, animationSpec = tween(durationMillis = 1))
-					animRotation.animateTo(
-						0f,
-						animationSpec = tween(durationMillis = 1500)
-					)
+	DisposableEffect(true) {
+		coroutineScope.launch {
+			try {
+				while (true) {
+					Timber.d("currentImageIndex: $currentImageIndex")
+					currentImagePreIndex = currentImageIndex
+					if (imageList.isNotEmpty()) {
+						currentImageIndex = Random.nextInt(imageList.size)
+						coroutineScope.launch {
+							animRotation.animateTo(5F, animationSpec = tween(durationMillis = 1))
+							animRotation.animateTo(
+								0f,
+								animationSpec = tween(durationMillis = 1500)
+							)
+						}
+					}
+					delay(6000)
 				}
+			} catch (e: Exception) {
+				Timber.e(e)
 			}
-			delay(6000)
-			currentImagePreIndex = currentImageIndex
 		}
+
+		onDispose {
+			coroutineScope.cancel()
+		}
+	}
+
+	LaunchedEffect(Unit) {
+
 	}
 
 

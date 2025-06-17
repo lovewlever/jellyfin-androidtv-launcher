@@ -67,6 +67,7 @@ fun TopSlideAppList(
 		var isActiveClose by remember { mutableStateOf(false) }
 		val context = LocalContext.current
 		val owner = LocalLifecycleOwner.current
+		var firstIn by remember { mutableStateOf(true) }
 		LaunchedEffect(true) {
 			(context as ComponentActivity).onBackPressedDispatcher.addCallback(owner, object : OnBackPressedCallback(true) {
 				override fun handleOnBackPressed() {
@@ -109,8 +110,9 @@ fun TopSlideAppList(
 							var pressed by remember { mutableStateOf(false) }
 							val scaleAnim by animateFloatAsState(targetValue = if (pressed) 1.12f else 1f, label = "")
 							val shapeRoundedDp by animateDpAsState(targetValue = if (pressed) 24.dp else 16.dp, label = "")
-							if (index == 0) {
+							if (index == 0 && firstIn) {
 								LaunchedEffect(Unit) {
+									firstIn = false
 									focusRequester.requestFocus()
 								}
 							}
