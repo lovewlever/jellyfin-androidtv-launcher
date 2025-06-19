@@ -31,18 +31,28 @@ if (WIN32)
             src/DrogonScreensaverController.cpp
             include/DrogonScreensaverController.h)
     message("Platform: " "WIN32")
-    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/win)
+    message("IS_DEBUG: " ${CMAKE_BUILD_TYPE})
+
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/win/debug)
+    else ()
+        link_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/win/release)
+    endif ()
 
     add_executable(${PROJECT_NAME} ${SRC_FILES})
-
-    file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/*.dll)
-    file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
 
     file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/config/*.yaml)
     file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/config/)
 
-    target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares zlibd)
-
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/debug/*.dll)
+        file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares zlibd)
+    else ()
+        file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/release/*.dll)
+        file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
+        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares zlib)
+    endif ()
 
 elseif (ANDROID)
     message("Platform: " "ANDROID")

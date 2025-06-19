@@ -18,8 +18,10 @@ public:
     static DrogonConfig &getInstance();
     int32_t loadDrogonConfig();
     std::string getScreensaverFolderPath() const;
+    [[nodiscard]] int32_t getListenPort() const;
 private:
     std::string gqScreensaverFolderPath;
+    int32_t gqListenPort{0};
     DrogonConfig() = default;
     ~DrogonConfig() = default;
 };

@@ -15,15 +15,17 @@ int main()
     std::thread t{
         []()
         {
+            const auto listenPort = DrogonConfig::getInstance().getListenPort();
+            std::cout << "start drogon server. listen: 127.0.0.1:" << listenPort << std::endl;
             app().setLogPath("./")
                     .setLogLevel(trantor::Logger::kInfo)
-                    .addListener("127.0.0.1", 8089)
+                    .addListener("127.0.0.1", listenPort)
                     .setThreadNum(4)
                     //.enableRunAsDaemon()
                     .run();
         }
     };
-    t.detach();
+    t.join();
 
     std::thread cli{
         []()

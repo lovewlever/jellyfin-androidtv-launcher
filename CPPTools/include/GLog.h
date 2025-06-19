@@ -21,6 +21,9 @@ public:
 
     static void logD(const char* tag, const char* text);
     static void logE(const char* tag, const char* text);
+
+    static int64_t getTimestamp();
+    static std::string getTimestampFormat();
 private:
 
 };

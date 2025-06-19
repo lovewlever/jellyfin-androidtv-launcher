@@ -6,6 +6,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -44,9 +45,14 @@ object JNICommon {
 	}
 
 	class CustomWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
+		private val json = Json {
+			ignoreUnknownKeys = true
+			isLenient = true
+		}
 		override suspend fun doWork(): Result {
 			Timber.d("CustomWorker startWork")
 			val jsonStr = queryScreensaverImageUrlList(hostName, hostPort)
+
 			Timber.d("CustomWorker jsonStr: $jsonStr")
 			return Result.success()
 		}

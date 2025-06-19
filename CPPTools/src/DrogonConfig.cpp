@@ -7,7 +7,7 @@
 #include "GLog.h"
 #include "yaml-cpp/yaml.h"
 
-DrogonConfig & DrogonConfig::getInstance()
+DrogonConfig &DrogonConfig::getInstance()
 {
     static DrogonConfig instance;
     return instance;
@@ -18,15 +18,17 @@ int32_t DrogonConfig::loadDrogonConfig()
     const auto yaml = YAML::LoadFile("config/drogon-config.yaml");
     if (yaml)
     {
-        const auto folder = yaml["ScreensaverFolderPath"];
-        if (folder)
+        try
         {
-            this->gqScreensaverFolderPath = folder.as<std::string>();
+            this->gqScreensaverFolderPath = yaml["ScreensaverFolderPath"].as<std::string>();
+            this->gqListenPort = yaml["ListenPort"].as<int32_t>();
             GLog::log() << "drogon-config loaded." << std::endl;
             return 0;
+        } catch (const YAML::Exception &e)
+        {
+            GLog::log() << "DrogonConfig loading failed." << e.msg << std::endl;
+            return -1;
         }
-        GLog::log() << "ScreensaverFolderPath loading failed." << std::endl;
-        return -1;
     }
     GLog::log() << "YAML loading failed." << std::endl;
     return -1;
@@ -37,4 +39,7 @@ std::string DrogonConfig::getScreensaverFolderPath() const
     return this->gqScreensaverFolderPath;
 }
 
-
+int32_t DrogonConfig::getListenPort() const
+{
+    return this->gqListenPort;
+}
