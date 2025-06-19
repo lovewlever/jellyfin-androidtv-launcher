@@ -2,7 +2,6 @@
 #include <drogon/drogon.h>
 #include <HttpGQScreensaver.h>
 
-#include "ClientConfig.h"
 using namespace drogon;
 
 int main()
@@ -13,7 +12,6 @@ int main()
         return i;
     }
     // 启动DrogonServer
-
     std::thread t{
         []()
         {
@@ -25,17 +23,19 @@ int main()
                     .run();
         }
     };
+    t.detach();
 
-    std::thread cli{[] ()
-    {
-        ClientConfig::getInstance().loadClientConfig("config/client-config.yaml");
-        while (true)
+    std::thread cli{
+        []()
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-            HttpGQScreensaver::newInstance()->queryScreensaverImageList();
+            while (true)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+                HttpGQScreensaver::newInstance()->queryScreensaverImageList("127.0.0.2", 8080);
+            }
         }
-    }};
-    cli.detach();
-    t.join();
+    };
+    cli.join();
+
     return 0;
 }

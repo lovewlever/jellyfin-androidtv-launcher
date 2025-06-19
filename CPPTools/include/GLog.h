@@ -18,6 +18,9 @@ public:
     inline static int32_t LogLevelError{1};
 
     static std::ostream & log(int32_t level = LogLevelInfo);
+
+    static void logD(const char* tag, const char* text);
+    static void logE(const char* tag, const char* text);
 private:
 
 };

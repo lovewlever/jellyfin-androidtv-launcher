@@ -7,12 +7,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -31,6 +25,7 @@ import org.jellyfin.androidtv.databinding.ActivityMainBinding
 import org.jellyfin.androidtv.integration.LeanbackChannelWorker
 import org.jellyfin.androidtv.ui.ScreensaverViewModel
 import org.jellyfin.androidtv.ui.background.AppBackground
+import org.jellyfin.androidtv.ui.gqcustom.JNICommon
 import org.jellyfin.androidtv.ui.navigation.NavigationAction
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
 import org.jellyfin.androidtv.ui.screensaver.InAppScreensaver
@@ -47,6 +42,7 @@ class MainActivity : FragmentActivity() {
 	private val userRepository by inject<UserRepository>()
 	private val screensaverViewModel by viewModel<ScreensaverViewModel>()
 	private val workManager by inject<WorkManager>()
+	private val serverRepository by inject<ServerRepository>()
 
 	private lateinit var binding: ActivityMainBinding
 
@@ -86,6 +82,8 @@ class MainActivity : FragmentActivity() {
 		}
 		binding.screensaver.setContent { InAppScreensaver() }
 		setContentView(binding.root)
+
+		gqCustomStartWorkManager()
 	}
 
 	override fun onResume() {
@@ -96,6 +94,28 @@ class MainActivity : FragmentActivity() {
 		applyTheme()
 
 		screensaverViewModel.activityPaused = false
+	}
+
+	private fun gqCustomStartWorkManager() {
+		sessionRepository.currentSession.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach {
+			it?.let {
+				serverRepository.getServer(it.serverId)?.let {
+					var address = it.address
+					var port = 8089
+					if (address.startsWith("https://")) {
+						address = address.replace("https://", "")
+					}
+					if (address.startsWith("http://")) {
+						address = address.replace("http://", "")
+					}
+					if (address.contains(":")) {
+						port = address.substring(address.indexOf(":") + 1).toInt() + 1
+						address = address.substring(0, address.indexOf(":"))
+					}
+					JNICommon.startWorkManager(this.application, address, port)
+				}
+			}
+		}.launchIn(lifecycleScope)
 	}
 
 	private fun validateAuthentication(): Boolean {

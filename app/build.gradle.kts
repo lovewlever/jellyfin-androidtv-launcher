@@ -78,6 +78,11 @@ android {
 	testOptions.unitTests.all {
 		it.useJUnitPlatform()
 	}
+	sourceSets {
+		getByName("main") {
+			jniLibs.srcDirs("src/main/jniLibs")
+		}
+	}
 }
 
 val versionTxt by tasks.registering {

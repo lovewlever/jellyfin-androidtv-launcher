@@ -18,7 +18,7 @@ public:
 
     static std::unique_ptr<HttpGQScreensaver> newInstance();
 
-    std::vector<std::string> queryScreensaverImageList() const;
+    std::string queryScreensaverImageList(const std::string &hostName, int32_t hostPort) const;
 
 private:
     HttpGQScreensaver() = default;

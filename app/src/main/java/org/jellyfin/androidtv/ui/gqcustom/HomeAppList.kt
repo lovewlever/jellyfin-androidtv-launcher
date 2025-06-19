@@ -69,6 +69,7 @@ fun TopSlideAppList(
 		val owner = LocalLifecycleOwner.current
 		var firstIn by remember { mutableStateOf(true) }
 		LaunchedEffect(true) {
+			JNICommon.test()
 			(context as ComponentActivity).onBackPressedDispatcher.addCallback(owner, object : OnBackPressedCallback(true) {
 				override fun handleOnBackPressed() {
 					if (showTopSlideAppList.value) {
