@@ -1,6 +1,5 @@
 package org.jellyfin.androidtv.ui.gqcustom
 
-import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -9,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -25,10 +24,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import dev.chrisbanes.haze.HazeStyle
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,13 +45,13 @@ fun GQScreensaver() {
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
 
-	val imageList = remember { mutableStateListOf<Bitmap>() }
+	val imageList = remember { mutableStateListOf<String>() }
 	LaunchedEffect(true) {
 		imageList.addAll(GQScreenCommon.loadImagesFromAssets(context))
 	}
 
+	val hazeState = rememberHazeState()
 	var currentImageIndex by remember { mutableIntStateOf(0) }
-	var currentImagePreIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
 
 	DisposableEffect(true) {
@@ -54,7 +59,6 @@ fun GQScreensaver() {
 			try {
 				while (true) {
 					Timber.d("currentImageIndex: $currentImageIndex")
-					currentImagePreIndex = currentImageIndex
 					if (imageList.isNotEmpty()) {
 						currentImageIndex = Random.nextInt(imageList.size)
 						coroutineScope.launch {
@@ -77,35 +81,44 @@ fun GQScreensaver() {
 		}
 	}
 
-	LaunchedEffect(Unit) {
-
-	}
-
 
 	if (imageList.isNotEmpty()) {
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier.background(color = Color.Black)
 		) {
-			val image = imageList[currentImageIndex].asImageBitmap()
 			AnimatedContent(
-				image,
+				currentImageIndex,
 				transitionSpec = {
 					(fadeIn(animationSpec = tween(2200, delayMillis = 90)))
 						.togetherWith(fadeOut(animationSpec = tween(2200)))
 				}) {
-				Image(
-					bitmap = it,
-					contentDescription = "",
-					modifier = Modifier
-						.fillMaxSize()
-						.customBlurCompatible(20.dp),
-					contentScale = ContentScale.Crop
-				)
+				key(imageList[it]) {
+					SubcomposeAsyncImage(
+						model = ImageRequest.Builder(context)
+							.data("file:///android_asset/${imageList[it]}")
+							.diskCachePolicy(CachePolicy.DISABLED)
+							.memoryCachePolicy(CachePolicy.ENABLED)
+							.size(1280, 720)
+							.build(),
+						contentDescription = "",
+						modifier = Modifier
+							.fillMaxSize()
+							.hazeSource(state = hazeState),
+						contentScale = ContentScale.Crop
+					)
+				}
+			}
+
+			key("GQScreensaverBlur") {
+				Box(modifier = Modifier
+					.fillMaxSize()
+					.background(color = Color.Transparent)
+					.customBlurCompatible(hazeState = hazeState, blur = 20.dp))
 			}
 
 			AnimatedContent(
-				image,
+				currentImageIndex,
 				transitionSpec = {
 					(fadeIn(animationSpec = tween(2000, delayMillis = 90)) +
 						scaleIn(
@@ -120,17 +133,22 @@ fun GQScreensaver() {
 								)
 						)
 				}) {
-				Image(
-					bitmap = it,
-					contentDescription = "",
-					modifier = Modifier
-						.fillMaxSize(),
-					contentScale = ContentScale.Fit
-				)
+				key(imageList[it]) {
+					SubcomposeAsyncImage(
+						model = ImageRequest.Builder(context)
+							.data("file:///android_asset/${imageList[it]}")
+							.diskCachePolicy(CachePolicy.DISABLED)
+							.memoryCachePolicy(CachePolicy.ENABLED)
+							.size(1280, 720)
+							.build(),
+						contentDescription = "",
+						modifier = Modifier
+							.fillMaxSize(),
+						contentScale = ContentScale.Fit
+					)
+				}
 			}
-
 		}
-
 	}
 }
 

@@ -15,7 +15,7 @@ void DrogonScreensaverController::queryScreensaverImageList(const drogon::HttpRe
                                                             callback)
 {
     const auto peer = req->peerAddr();
-    GLog::log() << "queryScreensaverImageList: 接收到请求IP: " << peer.toIp() << "\n";
+    GLog::log() << "queryScreensaverImageList: Receive Request IP: " << peer.toIp() << std::endl;
     const auto &dConfig = DrogonConfig::getInstance();
     const auto &folder = dConfig.getScreensaverFolderPath();
     std::filesystem::directory_iterator iter{folder};
@@ -24,11 +24,11 @@ void DrogonScreensaverController::queryScreensaverImageList(const drogon::HttpRe
     {
         if (entry.is_regular_file())
         {
-            imagePaths.push_back(std::filesystem::path(entry.path()).filename().string());
+            imagePaths.push_back(std::filesystem::path(entry.path()).filename().generic_string());
         }
     }
-    nlohmann::json json = imagePaths;
-    GLog::log() << "queryScreensaverImageList: 查询到的图片列表: " << json.dump() << "\n";
+    const nlohmann::json json = imagePaths;
+    GLog::log() << "queryScreensaverImageList: Find Images: " << json.dump() << std::endl;
     const auto response = drogon::HttpResponse::newHttpResponse();
     response->setBody(json.dump());
     callback(response);
@@ -38,11 +38,11 @@ void DrogonScreensaverController::getImage(const drogon::HttpRequestPtr &req,
     std::function<void(const drogon::HttpResponsePtr &)> &&callback, const std::string &imageName)
 {
     const auto peer = req->peerAddr();
-    GLog::log() << "getImage: 接收到请求IP: " << peer.toIp() << "\n";
+    GLog::log() << "getImage: Receive Request IP: " << peer.toIp() << std::endl;
     const auto &dConfig = DrogonConfig::getInstance();
     const auto &folder = dConfig.getScreensaverFolderPath();
     const auto &file = folder + "\\" + imageName;
-    GLog::log() << "getImage: 返回图片: " << file << "\n";
+    GLog::log() << "getImage: Return Image: " << file << std::endl;
     const auto resp = drogon::HttpResponse::newFileResponse(file);
     callback(resp);
 }

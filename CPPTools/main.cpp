@@ -16,10 +16,11 @@ int main()
         []()
         {
             const auto listenPort = DrogonConfig::getInstance().getListenPort();
-            std::cout << "start drogon server. listen: 127.0.0.1:" << listenPort << std::endl;
+            const auto listenHost = DrogonConfig::getInstance().getListenHost();
+            std::cout << "start drogon server. listen: " << listenHost << ":" << listenPort << std::endl;
             app().setLogPath("./")
                     .setLogLevel(trantor::Logger::kInfo)
-                    .addListener("127.0.0.1", listenPort)
+                    .addListener(listenHost, listenPort)
                     .setThreadNum(4)
                     //.enableRunAsDaemon()
                     .run();

@@ -22,6 +22,7 @@ int32_t DrogonConfig::loadDrogonConfig()
         {
             this->gqScreensaverFolderPath = yaml["ScreensaverFolderPath"].as<std::string>();
             this->gqListenPort = yaml["ListenPort"].as<int32_t>();
+            this->gqListenHost = yaml["ListenHost"].as<std::string>();
             GLog::log() << "drogon-config loaded." << std::endl;
             return 0;
         } catch (const YAML::Exception &e)
@@ -42,4 +43,9 @@ std::string DrogonConfig::getScreensaverFolderPath() const
 int32_t DrogonConfig::getListenPort() const
 {
     return this->gqListenPort;
+}
+
+std::string DrogonConfig::getListenHost() const
+{
+    return this->gqListenHost;
 }

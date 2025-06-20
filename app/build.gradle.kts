@@ -66,6 +66,11 @@ android {
 
 			buildConfigField("boolean", "DEVELOPMENT", (defaultConfig.versionCode!! < 100).toString())
 		}
+
+		debug {
+			isDebuggable = true
+			buildConfigField("Boolean", "DEBUG_MODE", "true")
+		}
 	}
 
 	lint {
