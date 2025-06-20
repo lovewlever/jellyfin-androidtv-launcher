@@ -180,4 +180,5 @@ dependencies {
 
 	implementation("androidx.compose.material3:material3:1.3.2")
 	implementation("dev.chrisbanes.haze:haze:1.6.4")
+	implementation("dev.chrisbanes.haze:haze-materials:1.6.4")
 }

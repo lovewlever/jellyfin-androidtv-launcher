@@ -8,8 +8,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
 
 @Composable
 fun Modifier.customBlur(blur: Dp = 10.dp): Modifier {
@@ -20,6 +21,7 @@ fun Modifier.customBlur(blur: Dp = 10.dp): Modifier {
 	}
 }
 
+@OptIn(ExperimentalHazeMaterialsApi::class)
 @Composable
 fun Modifier.customBlurCompatible(hazeState: HazeState? = null, blur: Dp = 10.dp): Modifier {
 	return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
@@ -27,10 +29,10 @@ fun Modifier.customBlurCompatible(hazeState: HazeState? = null, blur: Dp = 10.dp
 	} else {
 		this.hazeEffect(
 			state = hazeState,
-			style = HazeStyle.Unspecified, block = {
+			style = HazeMaterials.ultraThin(containerColor = Color.DarkGray), block = {
 			this.blurEnabled = true
 			this.blurRadius = blur
-			this.backgroundColor = Color.White
+			// this.backgroundColor = Color.White
 			this.noiseFactor = 0F
 		})
 	}
