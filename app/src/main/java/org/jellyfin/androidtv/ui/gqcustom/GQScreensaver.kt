@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -38,10 +39,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.ArrayList
 import kotlin.random.Random
 
 @Composable
-fun GQScreensaver() {
+fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
 
@@ -53,21 +55,41 @@ fun GQScreensaver() {
 	val hazeState = rememberHazeState()
 	var currentImageIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
+	var imageSource by remember { mutableStateOf("") }
+
+	val funcJNIGetScreensaverRemoteImageList = remember {
+		{
+			JNICommon.getScreensaverRemoteImageList()
+			// arrayListOf<String>()
+		}
+	}
+
+	val funcAnimRotationStart = remember {
+		{
+			coroutineScope.launch {
+				animRotation.animateTo(5F, animationSpec = tween(durationMillis = 1))
+				animRotation.animateTo(
+					0f,
+					animationSpec = tween(durationMillis = 1500)
+				)
+			}
+		}
+	}
 
 	DisposableEffect(true) {
 		coroutineScope.launch {
 			try {
 				while (true) {
 					Timber.d("currentImageIndex: $currentImageIndex")
-					if (imageList.isNotEmpty()) {
+					val remoteImageUrls = funcJNIGetScreensaverRemoteImageList()
+					if (remoteImageUrls.isNotEmpty()) {
+						currentImageIndex = Random.nextInt(remoteImageUrls.size)
+						imageSource = "${serverScreensaverHostUrlPrefix}/${remoteImageUrls[currentImageIndex]}"
+						funcAnimRotationStart()
+					} else if (imageList.isNotEmpty()) {
 						currentImageIndex = Random.nextInt(imageList.size)
-						coroutineScope.launch {
-							animRotation.animateTo(5F, animationSpec = tween(durationMillis = 1))
-							animRotation.animateTo(
-								0f,
-								animationSpec = tween(durationMillis = 1500)
-							)
-						}
+						imageSource = "file:///android_asset/" + imageList[currentImageIndex]
+						funcAnimRotationStart()
 					}
 					delay(6000)
 				}
@@ -82,23 +104,23 @@ fun GQScreensaver() {
 	}
 
 
-	if (imageList.isNotEmpty()) {
+	if (imageSource.isNotEmpty()) {
 		Box(
 			contentAlignment = Alignment.Center,
 			modifier = Modifier.background(color = Color.Black)
 		) {
 			AnimatedContent(
-				currentImageIndex,
+				imageSource,
 				transitionSpec = {
 					(fadeIn(animationSpec = tween(2200, delayMillis = 90)))
 						.togetherWith(fadeOut(animationSpec = tween(2200)))
 				}) {
-				key(imageList[it]) {
+				key(it) {
 					SubcomposeAsyncImage(
 						model = ImageRequest.Builder(context)
-							.data("file:///android_asset/${imageList[it]}")
-							.diskCachePolicy(CachePolicy.DISABLED)
-							.memoryCachePolicy(CachePolicy.ENABLED)
+							.data(it)
+							.diskCachePolicy(CachePolicy.ENABLED)
+							.diskCacheKey(it)
 							.size(1280, 720)
 							.build(),
 						contentDescription = "",
@@ -118,7 +140,7 @@ fun GQScreensaver() {
 			}
 
 			AnimatedContent(
-				currentImageIndex,
+				imageSource,
 				transitionSpec = {
 					(fadeIn(animationSpec = tween(2000, delayMillis = 90)) +
 						scaleIn(
@@ -133,12 +155,12 @@ fun GQScreensaver() {
 								)
 						)
 				}) {
-				key(imageList[it]) {
+				key(it) {
 					SubcomposeAsyncImage(
 						model = ImageRequest.Builder(context)
-							.data("file:///android_asset/${imageList[it]}")
-							.diskCachePolicy(CachePolicy.DISABLED)
-							.memoryCachePolicy(CachePolicy.ENABLED)
+							.data(it)
+							.diskCachePolicy(CachePolicy.ENABLED)
+							.diskCacheKey(it)
 							.size(1280, 720)
 							.build(),
 						contentDescription = "",

@@ -8,6 +8,7 @@
 #include <android/log.h>
 #endif
 #include <chrono>
+#include <iomanip>
 
 
 std::ostream &GLog::log(const int32_t level)

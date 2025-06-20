@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.gqcustom
 
 import android.content.Context
+import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -21,12 +22,14 @@ object JNICommon {
 
 	external fun queryScreensaverImageUrlList(hostName: String, hostPort: Int): String
 
+	external fun getScreensaverRemoteImageList(): List<String>
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	private const val UniqueWorkName = "ScreensaverImageUrlList"
 	private var hostName: String = ""
 	private var hostPort: Int = 0
-	private val ScreensaverImageUrlListUUID by lazy { UUID.randomUUID() }
+	private val ScreensaverImageUrlListUUID by lazy { UUID.fromString("7d7b6ec7-2616-44a1-9f7c-fa14e7323da2") }
 
 	fun startWorkManager(context: Context, hostName: String, hostPort: Int) {
 		this.hostName = hostName
@@ -34,35 +37,26 @@ object JNICommon {
 		val workManager = WorkManager.getInstance(context)
 		val workInfo = workManager.getWorkInfoById(ScreensaverImageUrlListUUID)
 		if (workInfo.get() != null) {
-			Timber.d("CustomWorker 已存在相同Worker 返回；")
-			return
+			Timber.d("CustomWorker 已存在相同Worker 将更新")
 		}
 		Timber.d("CustomWorker enqueueUniquePeriodicWork")
-		val perReqWorkerReq = PeriodicWorkRequestBuilder<CustomWorker>(10, TimeUnit.MINUTES)
+		val perReqWorkerReq = PeriodicWorkRequestBuilder<CustomWorker>(15, TimeUnit.MINUTES)
 			.setId(ScreensaverImageUrlListUUID)
+			.setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
 			.build()
-		workManager.enqueueUniquePeriodicWork(UniqueWorkName, ExistingPeriodicWorkPolicy.KEEP ,perReqWorkerReq)
+		workManager.enqueueUniquePeriodicWork(UniqueWorkName, ExistingPeriodicWorkPolicy.UPDATE ,perReqWorkerReq)
 	}
 
 	class CustomWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
-		private val json = Json {
-			ignoreUnknownKeys = true
-			isLenient = true
-		}
 		override suspend fun doWork(): Result {
 			Timber.d("CustomWorker startWork")
 			val jsonStr = queryScreensaverImageUrlList(hostName, hostPort)
-
 			Timber.d("CustomWorker jsonStr: $jsonStr")
-			return Result.success()
+			return if(jsonStr.isNotEmpty()) {
+				Result.success()
+			} else {
+				Result.retry()
+			}
 		}
-
-		/*override fun startWork(): ListenableFuture<Result?> {
-			return ListenableFutureTask.create {
-
-			}.apply { run() }
-		}*/
-
 	}
-
 }

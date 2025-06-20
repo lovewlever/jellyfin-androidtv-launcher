@@ -7,6 +7,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -45,6 +49,7 @@ class MainActivity : FragmentActivity() {
 	private val serverRepository by inject<ServerRepository>()
 
 	private lateinit var binding: ActivityMainBinding
+	private var serverScreensaverHostUrlPrefix by mutableStateOf("127.0.0.1:8097")
 
 	private val backPressedCallback = object : OnBackPressedCallback(false) {
 		override fun handleOnBackPressed() {
@@ -80,7 +85,7 @@ class MainActivity : FragmentActivity() {
 		binding.background.setContent {
 			AppBackground()
 		}
-		binding.screensaver.setContent { InAppScreensaver() }
+		binding.screensaver.setContent { InAppScreensaver(serverScreensaverHostUrlPrefix) }
 		setContentView(binding.root)
 
 		gqCustomStartWorkManager()
@@ -112,6 +117,7 @@ class MainActivity : FragmentActivity() {
 						port = address.substring(address.indexOf(":") + 1).toInt() + 1
 						address = address.substring(0, address.indexOf(":"))
 					}
+					serverScreensaverHostUrlPrefix = "http://$address:$port"
 					JNICommon.startWorkManager(this.application, address, port)
 				}
 			}

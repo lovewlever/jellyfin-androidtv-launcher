@@ -20,7 +20,7 @@ import org.jellyfin.androidtv.ui.gqcustom.GQScreensaver
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun InAppScreensaver() {
+fun InAppScreensaver(serverScreensaverHostUrlPrefix: String) {
 	val screensaverViewModel = koinViewModel<ScreensaverViewModel>()
 	val visible by screensaverViewModel.visible.collectAsState()
 
@@ -41,7 +41,7 @@ fun InAppScreensaver() {
 				}
 		) {
 			// DreamHost()
-			GQScreensaver()
+			GQScreensaver(serverScreensaverHostUrlPrefix)
 		}
 	}
 }
