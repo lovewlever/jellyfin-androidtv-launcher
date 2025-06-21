@@ -121,8 +121,7 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 							.build(),
 						contentDescription = "",
 						modifier = Modifier
-							.fillMaxSize()
-							.hazeSource(state = hazeState),
+							.fillMaxSize(),
 						contentScale = ContentScale.Crop
 					)
 				}
