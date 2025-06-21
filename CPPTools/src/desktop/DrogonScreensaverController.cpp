@@ -2,8 +2,8 @@
 // Created by catog on 2025/6/17.
 //
 
-#include "../include/DrogonScreensaverController.h"
-#include <DrogonConfig.h>
+#include "desktop/DrogonScreensaverController.h"
+#include <desktop/DrogonConfig.h>
 #include <filesystem>
 #include <nlohmann/json.hpp>
 

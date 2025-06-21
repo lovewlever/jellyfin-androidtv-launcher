@@ -2,9 +2,9 @@
 // Created by catog on 2025/6/17.
 //
 
-#include "../include/DrogonServer.h"
+#include "../../include/desktop/DrogonServer.h"
 
-#include "DrogonConfig.h"
+#include "../../include/desktop/DrogonConfig.h"
 #include "GLog.h"
 #include <thread>
 

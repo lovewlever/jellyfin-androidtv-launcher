@@ -17,19 +17,19 @@ FetchContent_MakeAvailable(yaml-cpp)
 if (WIN32)
     include_directories(include)
 
-    set(SRC_FILES src/library.cpp
+    set(SRC_FILES
             src/HttpGQScreensaver.cpp
-            include/HttpGQScreensaver.h
+            include/mobile/HttpGQScreensaver.h
             main.cpp
             jni.cpp
-            src/DrogonServer.cpp
-            include/DrogonServer.h
-            src/DrogonConfig.cpp
-            include/DrogonConfig.h
+            src/desktop/DrogonServer.cpp
+            include/desktop/DrogonServer.h
+            src/desktop/DrogonConfig.cpp
+            include/desktop/DrogonConfig.h
             src/GLog.cpp
             include/GLog.h
-            src/DrogonScreensaverController.cpp
-            include/DrogonScreensaverController.h)
+            src/desktop/DrogonScreensaverController.cpp
+            include/desktop/DrogonScreensaverController.h)
     message("Platform: " "WIN32")
     message("IS_DEBUG: " ${CMAKE_BUILD_TYPE})
 
@@ -60,7 +60,7 @@ elseif (ANDROID)
     find_library(log-lib log)
     add_library(${PROJECT_NAME} SHARED include/GLog.h src/GLog.cpp
             include/httplib.h
-            include/HttpGQScreensaver.h
+            include/mobile/HttpGQScreensaver.h
             src/HttpGQScreensaver.cpp
             jni.cpp
             )

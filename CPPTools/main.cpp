@@ -1,8 +1,8 @@
-#include "DrogonConfig.h"
+#include "include/desktop/DrogonConfig.h"
 #include <drogon/drogon.h>
-#include <HttpGQScreensaver.h>
+#include <mobile/HttpGQScreensaver.h>
 
-#include "DrogonServer.h"
+#include "include/desktop/DrogonServer.h"
 #include "GLog.h"
 
 using namespace drogon;

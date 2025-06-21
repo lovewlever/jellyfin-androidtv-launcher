@@ -2,7 +2,7 @@
 // Created by catog on 2025/6/17.
 //
 
-#include "../include/DrogonConfig.h"
+#include "../../include/desktop/DrogonConfig.h"
 
 #include "GLog.h"
 #include "yaml-cpp/yaml.h"
