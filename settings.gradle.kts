@@ -16,6 +16,9 @@ pluginManagement {
 	repositories {
 		gradlePluginPortal()
 		mavenCentral()
+		maven {
+			url = uri("https://jitpack.io")
+		}
 		google()
 	}
 }
@@ -23,6 +26,9 @@ pluginManagement {
 dependencyResolutionManagement {
 	repositories {
 		mavenCentral()
+		maven {
+			url = uri("https://jitpack.io")
+		}
 		google()
 
 		// Jellyfin SDK

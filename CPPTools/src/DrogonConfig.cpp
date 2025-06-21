@@ -24,14 +24,17 @@ int32_t DrogonConfig::loadDrogonConfig()
             this->gqListenPort = yaml["ListenPort"].as<int32_t>();
             this->gqListenHost = yaml["ListenHost"].as<std::string>();
             GLog::log() << "drogon-config loaded." << std::endl;
+            std::cout << "drogon-config loaded." << std::endl;
             return 0;
         } catch (const YAML::Exception &e)
         {
             GLog::log() << "DrogonConfig loading failed." << e.msg << std::endl;
+            std::cerr << "DrogonConfig loading failed." << e.msg << std::endl;
             return -1;
         }
     }
     GLog::log() << "YAML loading failed." << std::endl;
+    std::cerr << "YAML loading failed." << std::endl;
     return -1;
 }
 

@@ -9,16 +9,54 @@
 #endif
 #include <chrono>
 #include <iomanip>
+#include <filesystem>
+#include <fstream>
 
+
+bool GLog::writeToFile{false};
+std::unique_ptr<std::ofstream> GLog::logFileOfsPtr{nullptr};
+
+void GLog::generateLogFile()
+{
+    const auto now = std::chrono::system_clock::now() + std::chrono::hours(8);
+    const auto time_t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss{};
+    ss << "log/" << std::put_time(std::gmtime(&time_t), "%Y-%m-%d_%H") << ".log";
+
+   if (!std::filesystem::is_directory("log"))
+   {
+       std::filesystem::create_directory("log");
+   }
+
+    if (!std::filesystem::exists(ss.str()))
+    {
+        std::fstream fss(ss.str(), std::ios::out | std::ios::trunc);
+        fss.close();
+    }
+
+    if (auto oss = std::make_unique<std::ofstream>(ss.str(), std::ios::binary | std::ios::app); oss->is_open())
+    {
+        writeToFile = true;
+        logFileOfsPtr = std::move(oss);
+    }
+}
 
 std::ostream &GLog::log(const int32_t level)
 {
     if (level == LogLevelError)
     {
+        if (writeToFile)
+        {
+            return *logFileOfsPtr << getTimestampFormat() << ": ";
+        }
         return std::cerr << getTimestampFormat() << ": ";
     }
     if (level == LogLevelInfo)
     {
+        if (writeToFile)
+        {
+            return *logFileOfsPtr << getTimestampFormat() << ": ";
+        }
         return std::cout << getTimestampFormat() << ": ";
     }
     return std::cout << getTimestampFormat() << ": ";

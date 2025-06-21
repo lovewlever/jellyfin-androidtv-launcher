@@ -17,6 +17,8 @@ public:
     inline static int32_t LogLevelInfo{0};
     inline static int32_t LogLevelError{1};
 
+    static void generateLogFile();
+
     static std::ostream & log(int32_t level = LogLevelInfo);
 
     static void logD(const char* tag, const char* text);
@@ -26,6 +28,8 @@ public:
     static std::string getTimestampFormat();
 private:
 
+    static bool writeToFile;
+    static std::unique_ptr<std::ofstream> logFileOfsPtr;
 };
 
 #endif //GLOG_H

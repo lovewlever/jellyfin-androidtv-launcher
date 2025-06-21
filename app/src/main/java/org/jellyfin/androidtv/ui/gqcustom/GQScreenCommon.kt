@@ -8,7 +8,6 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 
 object GQScreenCommon {
-	// 从Assets加载图片，优化为低分辨率以适配低端设备
 	suspend fun loadImagesFromAssets(context: Context): List<String> {
 		return withContext(Dispatchers.IO) {
 			val assetManager = context.assets

@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
+import coil3.request.transformations
+import com.commit451.coiltransformations.BlurTransformation
 import dev.chrisbanes.haze.HazeStyle
 import dev.chrisbanes.haze.hazeEffect
 import dev.chrisbanes.haze.hazeSource
@@ -38,6 +40,7 @@ import dev.chrisbanes.haze.rememberHazeState
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jellyfin.androidtv.integration.dream.composable.DreamHost
 import timber.log.Timber
 import java.util.ArrayList
 import kotlin.random.Random
@@ -47,11 +50,6 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
 
-	val imageList = remember { mutableStateListOf<String>() }
-	LaunchedEffect(true) {
-		imageList.addAll(GQScreenCommon.loadImagesFromAssets(context))
-	}
-
 	val hazeState = rememberHazeState()
 	var currentImageIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
@@ -60,7 +58,6 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 	val funcJNIGetScreensaverRemoteImageList = remember {
 		{
 			JNICommon.getScreensaverRemoteImageList()
-			// arrayListOf<String>()
 		}
 	}
 
@@ -86,10 +83,8 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 						currentImageIndex = Random.nextInt(remoteImageUrls.size)
 						imageSource = "${serverScreensaverHostUrlPrefix}/${remoteImageUrls[currentImageIndex]}"
 						funcAnimRotationStart()
-					} else if (imageList.isNotEmpty()) {
-						currentImageIndex = Random.nextInt(imageList.size)
-						imageSource = "file:///android_asset/" + imageList[currentImageIndex]
-						funcAnimRotationStart()
+					} else {
+						imageSource = ""
 					}
 					delay(6000)
 				}
@@ -119,6 +114,7 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 					SubcomposeAsyncImage(
 						model = ImageRequest.Builder(context)
 							.data(it)
+							.transformations(BlurTransformation(context, 10f, 2f))
 							.diskCachePolicy(CachePolicy.ENABLED)
 							.diskCacheKey(it)
 							.size(1280, 720)
@@ -132,12 +128,12 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 				}
 			}
 
-			key("GQScreensaverBlur") {
-				Box(modifier = Modifier
-					.fillMaxSize()
-					.background(color = Color.Transparent)
-					.customBlurCompatible(hazeState = hazeState, blur = 20.dp))
-			}
+//			key("GQScreensaverBlur") {
+//				Box(modifier = Modifier
+//					.fillMaxSize()
+//					.background(color = Color.Transparent)
+//					.customBlurCompatible(hazeState = hazeState, blur = 20.dp))
+//			}
 
 			AnimatedContent(
 				imageSource,
@@ -171,6 +167,8 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 				}
 			}
 		}
+	} else {
+		DreamHost()
 	}
 }
 
