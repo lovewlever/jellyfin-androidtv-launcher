@@ -173,6 +173,11 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		var subtitlesBackgroundColor = longPreference("subtitles_background_color", 0x00FFFFFF)
 
 		/**
+		 * Subtitles bold text
+		 */
+		var subtitlesTextWeight = intPreference("subtitles_text_weight", 400)
+
+		/**
 		 * Subtitles foreground color
 		 */
 		var subtitlesTextColor = longPreference("subtitles_text_color", 0xFFFFFFFF)
@@ -237,6 +242,11 @@ class UserPreferences(context: Context) : SharedPreferenceStore(
 		 * Enable libass.
 		 */
 		var assDirectPlay = booleanPreference("libass_enabled", false)
+
+		/**
+  		 * Enable PGS subtitle direct-play.
+		 */
+		var pgsDirectPlay = booleanPreference("pgs_enabled", true)
 	}
 
 	init {
