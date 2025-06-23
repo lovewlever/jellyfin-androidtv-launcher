@@ -6,9 +6,10 @@
  - Added the function of setting as Launcher
  - Added jump to system settings icon
  - Add APP list page
- - Added Screen saver to display the images in the directory specified by the server, and JellyfinToolsServer.exe to implement the server
+ - Added Screen saver to display the images in the directory specified by the server, and JellyfinCPPTools.exe to implement the server
+   - When ```ScreensaverFolderPath``` is empty or the ```JellyfinCPPTools``` service is not started, the default Screen saver will be displayed.
    - ```config/drogon-config.yaml ```
-   - The port number is jellyfin Server + 1. The port number of Jellyfin Server is 8096, so please fill in 8097 for ListenPort of JellyfinToolsServer config.
+   - The port number is jellyfin server + 1. The port number of Jellyfin Server is 8096, so please fill in 8097 for ListenPort of ```JellyfinCPPTools``` config.
 
 ## Build Process
 
