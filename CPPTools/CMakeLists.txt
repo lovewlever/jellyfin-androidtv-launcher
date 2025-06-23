@@ -18,7 +18,6 @@ if (WIN32)
     include_directories(include)
 
     set(SRC_FILES
-            src/HttpGQScreensaver.cpp
             include/mobile/HttpGQScreensaver.h
             main.cpp
             jni.cpp
@@ -61,7 +60,7 @@ elseif (ANDROID)
     add_library(${PROJECT_NAME} SHARED include/GLog.h src/GLog.cpp
             include/httplib.h
             include/mobile/HttpGQScreensaver.h
-            src/HttpGQScreensaver.cpp
+            src/mobile/HttpGQScreensaver.cpp
             jni.cpp
             )
 

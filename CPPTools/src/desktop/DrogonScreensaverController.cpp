@@ -14,6 +14,7 @@ void DrogonScreensaverController::queryScreensaverImageList(const drogon::HttpRe
                                                             std::function<void(const drogon::HttpResponsePtr &)> &&
                                                             callback)
 {
+    GLog::generateLogFile();
     const auto peer = req->peerAddr();
     GLog::log() << "queryScreensaverImageList: Receive Request IP: " << peer.toIp() << std::endl;
     const auto &dConfig = DrogonConfig::getInstance();
