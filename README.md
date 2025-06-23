@@ -6,6 +6,9 @@
  - Added the function of setting as Launcher
  - Added jump to system settings icon
  - Add APP list page
+ - Added Screen saver to display the images in the directory specified by the server, and JellyfinToolsServer.exe to implement the server
+   - ```config/drogon-config.yaml ```
+   - The port number is jellyfin Server + 1. The port number of Jellyfin Server is 8096, so please fill in 8097 for ListenPort of JellyfinToolsServer config.
 
 ## Build Process
 
