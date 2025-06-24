@@ -80,12 +80,15 @@ void ScreensaverImageList::downloadScreensaverRemoteImageListToLocalPath(const s
             GLog::logD("dSRemoteILToLocalPath", osss.str().c_str());
             for (const auto &imageName: vecs)
             {
-                GLog::logD("dSRemoteILToLocalPath", ("Start Download: " + imageName).c_str());
-                std::string fullPath{savePath + "/" + imageName};
-                std::ofstream ofs{fullPath, std::ios::out | std::ios::binary};
+
+                std::string fullImageUrl = serverUrl + "/" + imageName;
+                std::string fullLocalFilePath{savePath + "/" + imageName};
+
+                GLog::logD("dSRemoteILToLocalPath", ("Start Download: " + fullImageUrl).c_str());
+                std::ofstream ofs{fullLocalFilePath, std::ios::out | std::ios::binary};
                 if (!ofs.is_open())
                 {
-                    GLog::logE("dSRemoteILToLocalPath", (fullPath + " ofs 打开失败").c_str());
+                    GLog::logE("dSRemoteILToLocalPath", (fullLocalFilePath + " ofs 打开失败").c_str());
                     continue;
                 }
 
@@ -98,12 +101,16 @@ void ScreensaverImageList::downloadScreensaverRemoteImageListToLocalPath(const s
                 ofs.close();
                 if (resp.error() == httplib::Error::Success)
                 {
-                    GLog::logE("dSRemoteILToLocalPath", (imageName + " 下载成功").c_str());
+                    GLog::logE("dSRemoteILToLocalPath", (fullImageUrl + " 下载成功").c_str());
                 } else
                 {
                     std::stringstream ss{};
-                    ss << imageName << " 下载失败：" << resp.error();
+                    ss << fullImageUrl << " 下载失败：" << resp.error();
                     GLog::logE("dSRemoteILToLocalPath", ss.str().c_str());
+                    if (std::filesystem::exists(fullLocalFilePath))
+                    {
+                        std::filesystem::remove(fullLocalFilePath);
+                    }
                 }
             }
         });
