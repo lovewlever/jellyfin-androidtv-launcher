@@ -20,7 +20,13 @@ object JNICommon {
 
 	external fun test()
 
+	external fun init(cacheDirPath: String, debug: Boolean): Int
+
+	external fun setCurrentServerUrl(serverUrl: String): Int
+
 	external fun queryScreensaverImageUrlList(hostName: String, hostPort: Int): String
+
+	external fun downloadScreensaverRemoteImageListToLocalPath(): Int
 
 	external fun getScreensaverRemoteImageList(): List<String>
 
@@ -51,7 +57,8 @@ object JNICommon {
 		override suspend fun doWork(): Result {
 			Timber.d("CustomWorker startWork")
 			val jsonStr = queryScreensaverImageUrlList(hostName, hostPort)
-			Timber.d("CustomWorker jsonStr: $jsonStr")
+			// val download = downloadScreensaverRemoteImageListToLocalPath()
+			Timber.d("CustomWorker jsonStr: $jsonStr; DownloadToLocal: nullptr")
 			return if(jsonStr.isNotEmpty()) {
 				Result.success()
 			} else {

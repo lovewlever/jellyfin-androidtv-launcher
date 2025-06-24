@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.JellyfinApplication
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.repository.SessionRepository
@@ -32,6 +33,7 @@ import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.databinding.ActivityStartupBinding
 import org.jellyfin.androidtv.ui.background.AppBackground
 import org.jellyfin.androidtv.ui.browsing.MainActivity
+import org.jellyfin.androidtv.ui.gqcustom.JNICommon
 import org.jellyfin.androidtv.ui.itemhandling.ItemLauncher
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -84,6 +86,8 @@ class StartupActivity : FragmentActivity() {
 		applyTheme()
 
 		super.onCreate(savedInstanceState)
+
+		JNICommon.init(this.cacheDir.absolutePath, BuildConfig.DEBUG)
 
 		binding = ActivityStartupBinding.inflate(layoutInflater)
 		binding.background.setContent { AppBackground() }

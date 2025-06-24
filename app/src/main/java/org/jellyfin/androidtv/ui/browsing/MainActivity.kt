@@ -118,6 +118,7 @@ class MainActivity : FragmentActivity() {
 						address = address.substring(0, address.indexOf(":"))
 					}
 					serverScreensaverHostUrlPrefix = "http://$address:$port"
+					JNICommon.setCurrentServerUrl(serverScreensaverHostUrlPrefix)
 					JNICommon.startWorkManager(this.application, address, port)
 				}
 			}

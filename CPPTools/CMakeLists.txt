@@ -19,6 +19,7 @@ if (WIN32)
 
     set(SRC_FILES
             include/mobile/HttpGQScreensaver.h
+            src/mobile/HttpGQScreensaver.cpp
             main.cpp
             jni.cpp
             src/desktop/DrogonServer.cpp
@@ -28,7 +29,13 @@ if (WIN32)
             src/GLog.cpp
             include/GLog.h
             src/desktop/DrogonScreensaverController.cpp
-            include/desktop/DrogonScreensaverController.h)
+            include/desktop/DrogonScreensaverController.h
+            src/Constants.cpp
+            include/Constants.h
+            src/mobile/ScreensaverImageList.cpp
+            include/mobile/ScreensaverImageList.h
+
+            )
     message("Platform: " "WIN32")
     message("IS_DEBUG: " ${CMAKE_BUILD_TYPE})
 
@@ -61,6 +68,10 @@ elseif (ANDROID)
             include/httplib.h
             include/mobile/HttpGQScreensaver.h
             src/mobile/HttpGQScreensaver.cpp
+            src/Constants.cpp
+            include/Constants.h
+            src/mobile/ScreensaverImageList.cpp
+            include/mobile/ScreensaverImageList.h
             jni.cpp
             )
 
