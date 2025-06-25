@@ -20,6 +20,8 @@ public:
 
     static std::shared_ptr<std::string> getScreensaverRemoteImageList();
 
+    static std::vector<std::string> getScreensaverLocalImageList();
+
     static void updateScreensaverRemoteImageList(const std::string &imagesStr);
 
     static void downloadScreensaverRemoteImageListToLocalPath(const std::vector<std::string> &images);

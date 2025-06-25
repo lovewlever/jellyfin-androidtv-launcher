@@ -17,6 +17,11 @@ void Constants::setMobilePackageCacheDirPath(const std::string &&value)
     mobilePackageCacheDirPath = value;
 }
 
+std::string Constants::getMobileScreensaverImageListDirPath()
+{
+    return mobilePackageCacheDirPath + mobilePkgCacheDirPathChildFolder;
+}
+
 std::string Constants::getMobileServerUrl()
 {
     return mobileServerUrl;

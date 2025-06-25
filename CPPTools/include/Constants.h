@@ -12,11 +12,13 @@ class Constants
 public:
     static std::string getMobilePackageCacheDirPath();
     static void setMobilePackageCacheDirPath(const std::string &&value);
+    static std::string getMobileScreensaverImageListDirPath();
 
     static std::string getMobileServerUrl();
     static void setMobileServerUrl(const std::string &&value);
 private:
     static std::string mobilePackageCacheDirPath;
+    inline static std::string mobilePkgCacheDirPathChildFolder{"/screensaverimagelist"};
     inline static std::string mobileServerUrl{};
 };
 

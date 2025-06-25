@@ -15,7 +15,7 @@ int main()
 {
     // GLog::EnableLog = true;
     // Constants::setMobileServerUrl("http://127.0.0.1:8097");
-    // Constants::setMobilePackageCacheDirPath(R"(C:\Users\catog\Downloads\testDownload)");
+    //Constants::setMobilePackageCacheDirPath(R"(C:\Users\catog\Pictures)");
     //
     // const auto saverPtr = HttpGQScreensaver::newInstance();
     // const auto remoteList = saverPtr->queryScreensaverImageList("127.0.0.1", 8097);
@@ -26,7 +26,8 @@ int main()
     // const auto imageList = nlohmann::json::parse(*list);
     // ScreensaverImageList::downloadScreensaverRemoteImageListToLocalPath(imageList);
     //
-    // return 0;
+    //ScreensaverImageList::getScreensaverLocalImageList();
+    //return 0;
 
     const auto ds = std::make_unique<DrogonServer>();
     return ds->startServer(false);
