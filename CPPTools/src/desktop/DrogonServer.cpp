@@ -25,8 +25,14 @@ int32_t DrogonServer::startServer(const bool threadDetach) const
         {
             const auto listenPort = DrogonConfig::getInstance().getListenPort();
             const auto listenHost = DrogonConfig::getInstance().getListenHost();
-            GLog::log() << "start drogon server. listen: " << listenHost << ":" << listenPort << std::endl;
-            std::cout << "start drogon server. listen: " << listenHost << ":" << listenPort << std::endl;
+            const auto screensaverFolder = DrogonConfig::getInstance().getScreensaverFolderPath();
+
+            GLog::log() << "Start jellyfin tools server. listen: " << listenHost << ":" << listenPort << std::endl;
+            GLog::log() << "Screen saver folder: " << screensaverFolder << std::endl;
+
+            std::cout << "Start jellyfin tools server. listen: " << listenHost << ":" << listenPort << std::endl;
+            std::cout << "Screen saver folder: " << screensaverFolder << std::endl;
+
             drogon::app().setLogPath("./")
                     .setLogLevel(trantor::Logger::kInfo)
                     .addListener(listenHost, listenPort)

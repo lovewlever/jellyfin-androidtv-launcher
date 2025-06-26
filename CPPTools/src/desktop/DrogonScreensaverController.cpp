@@ -14,29 +14,39 @@ void DrogonScreensaverController::queryScreensaverImageList(const drogon::HttpRe
                                                             std::function<void(const drogon::HttpResponsePtr &)> &&
                                                             callback)
 {
-    GLog::generateLogFile();
-    const auto peer = req->peerAddr();
-    GLog::log() << "queryScreensaverImageList: Receive Request IP: " << peer.toIp() << std::endl;
-    const auto &dConfig = DrogonConfig::getInstance();
-    const auto &folder = dConfig.getScreensaverFolderPath();
-    std::filesystem::directory_iterator iter{folder};
-    std::vector<std::string> imagePaths{};
-    for (const auto &entry : iter)
+    try
     {
-        if (entry.is_regular_file())
+        GLog::generateLogFile();
+        const auto peer = req->peerAddr();
+        GLog::log() << "queryScreensaverImageList: Receive Request IP: " << peer.toIp() << std::endl;
+        const auto &dConfig = DrogonConfig::getInstance();
+        const auto &folder = dConfig.getScreensaverFolderPath();
+        std::filesystem::directory_iterator iter{folder};
+        std::vector<std::string> imagePaths{};
+        for (const auto &entry: iter)
         {
-            imagePaths.push_back(std::filesystem::path(entry.path()).filename().generic_string());
+            if (entry.is_regular_file())
+            {
+                imagePaths.push_back(std::filesystem::path(entry.path()).filename().generic_string());
+            }
         }
+        const nlohmann::json json = imagePaths;
+        GLog::log() << "queryScreensaverImageList: Find Images: " << json.dump() << std::endl;
+        const auto response = drogon::HttpResponse::newHttpResponse();
+        response->setBody(json.dump());
+        callback(response);
+    } catch (const std::exception &e)
+    {
+        GLog::log(GLog::LogLevelError) << "queryScreensaverImageList: ERROR: " << e.what() << std::endl;
+        const auto response = drogon::HttpResponse::newHttpResponse();
+        response->setBody(e.what());
+        callback(response);
     }
-    const nlohmann::json json = imagePaths;
-    GLog::log() << "queryScreensaverImageList: Find Images: " << json.dump() << std::endl;
-    const auto response = drogon::HttpResponse::newHttpResponse();
-    response->setBody(json.dump());
-    callback(response);
 }
 
 void DrogonScreensaverController::getImage(const drogon::HttpRequestPtr &req,
-    std::function<void(const drogon::HttpResponsePtr &)> &&callback, const std::string &imageName)
+                                           std::function<void(const drogon::HttpResponsePtr &)> &&callback,
+                                           const std::string &imageName)
 {
     const auto peer = req->peerAddr();
     GLog::log() << "getImage: Receive Request IP: " << peer.toIp() << std::endl;

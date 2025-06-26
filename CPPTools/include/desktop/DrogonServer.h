@@ -14,7 +14,7 @@ public:
     DrogonServer &operator=(const DrogonServer &) = delete;
     DrogonServer(DrogonServer &&) = delete;
 
-    int32_t startServer(const bool threadDetach) const;
+    [[nodiscard]] int32_t startServer(bool threadDetach) const;
 };
 
 
