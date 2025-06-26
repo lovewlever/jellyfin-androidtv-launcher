@@ -11,6 +11,10 @@
    - ```config/drogon-config.yaml ```
    - The port number is jellyfin server + 1. The port number of Jellyfin Server is 8096, so please fill in 8097 for ListenPort of ```JellyfinCPPTools``` config.
 
+## Future
+ - Episodes: Playing Selections
+ - Picture-in-Picture
+
 ## Build Process
 
 ### Dependencies
