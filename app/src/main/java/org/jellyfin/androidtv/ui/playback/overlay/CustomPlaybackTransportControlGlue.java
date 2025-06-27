@@ -1,5 +1,6 @@
 package org.jellyfin.androidtv.ui.playback.overlay;
 
+import static org.jellyfin.androidtv.ui.playback.overlay.PlayingSelectionsViewKt.createPlayingSelectionsView;
 import static java.lang.Math.round;
 
 import android.content.Context;
@@ -44,10 +45,13 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.SkipNextAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SkipPreviousAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ZoomAction;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
+import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -83,10 +87,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
     private LinearLayout mButtonRef;
 
-    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController) {
+    private List<BaseItemDto> mItemsToPlay = new ArrayList<>();
+
+    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, List<BaseItemDto> itemsToPlay) {
         super(context, playerAdapter);
         this.playbackController = playbackController;
-
+        this.mItemsToPlay = itemsToPlay;
         mRefreshEndTime = () -> {
             setEndTime();
             if (!isPlaying()) {
@@ -159,6 +165,10 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     rlp2.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     rl.addView(mEndsText, rlp2);
                     bar.addView(rl, 0, rlp);
+
+                    // Add Episodes Playing Selections
+
+                    view.addView(createPlayingSelectionsView(context, mItemsToPlay));
                 }
 
                 return vh;

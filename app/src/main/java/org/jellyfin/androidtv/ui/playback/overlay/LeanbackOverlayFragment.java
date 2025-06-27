@@ -15,6 +15,10 @@ import org.jellyfin.androidtv.ui.playback.CustomPlaybackOverlayFragment;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer;
 import org.jellyfin.sdk.api.client.ApiClient;
+import org.jellyfin.sdk.model.api.BaseItemDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import coil3.ImageLoader;
 import kotlin.Lazy;
@@ -29,6 +33,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     private Lazy<ImageLoader> imageLoader = inject(ImageLoader.class);
     private Lazy<ApiClient> api = inject(ApiClient.class);
     private Lazy<UserPreferences> userPreferences = inject(UserPreferences.class);
+    private List<BaseItemDto> mItemsToPlay = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
         }
 
         playerAdapter = new VideoPlayerAdapter(playbackController, this);
-        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController);
+        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController, mItemsToPlay);
         playerGlue.setHost(new CustomPlaybackFragmentGlueHost(this));
     }
 
@@ -57,6 +62,11 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment) {
         playerGlue.setInitialPlaybackDrawable();
         playerAdapter.setMasterOverlayFragment(customPlaybackOverlayFragment);
+    }
+
+    public void setItemsToPlay(List<BaseItemDto> itemsToPlay) {
+        this.mItemsToPlay.clear();
+        this.mItemsToPlay.addAll(itemsToPlay);
     }
 
     @Override

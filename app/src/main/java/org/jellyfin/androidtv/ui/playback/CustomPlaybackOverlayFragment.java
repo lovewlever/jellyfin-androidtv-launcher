@@ -314,6 +314,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     private void prepareOverlayFragment() {
         leanbackOverlayFragment = (LeanbackOverlayFragment) getChildFragmentManager().findFragmentById(R.id.leanback_fragment);
         if (leanbackOverlayFragment != null) {
+            leanbackOverlayFragment.setItemsToPlay(mItemsToPlay);
             leanbackOverlayFragment.initFromView(this);
             leanbackOverlayFragment.mediaInfoChanged();
             leanbackOverlayFragment.setOnKeyInterceptListener(keyListener);
