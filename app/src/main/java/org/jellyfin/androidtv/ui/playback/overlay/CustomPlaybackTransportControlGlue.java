@@ -45,13 +45,13 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.SkipNextAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SkipPreviousAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ZoomAction;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
+import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -87,12 +87,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
     private LinearLayout mButtonRef;
 
-    private List<BaseItemDto> mItemsToPlay = new ArrayList<>();
+    private final AtomicReference<BaseItemDto> currentItem;
 
-    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, List<BaseItemDto> itemsToPlay) {
+    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, AtomicReference<BaseItemDto> currentItem) {
         super(context, playerAdapter);
         this.playbackController = playbackController;
-        this.mItemsToPlay = itemsToPlay;
+        this.currentItem = currentItem;
         mRefreshEndTime = () -> {
             setEndTime();
             if (!isPlaying()) {
@@ -166,9 +166,18 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     rl.addView(mEndsText, rlp2);
                     bar.addView(rl, 0, rlp);
 
-                    // Add Episodes Playing Selections
 
-                    view.addView(createPlayingSelectionsView(context, mItemsToPlay));
+                    // Remove bottom padding
+                    parent.setPadding(parent.getPaddingStart(), parent.getPaddingTop(), parent.getPaddingEnd(), 0);
+                    view.setPadding(
+                            view.getPaddingStart(),
+                            view.getPaddingTop(),
+                            view.getPaddingEnd(),
+                            0);
+                    // Add Episodes Playing Selections
+                    view.addView(createPlayingSelectionsView(context, currentItem, (integer, baseItemDto) -> {
+                        return null;
+                    }));
                 }
 
                 return vh;

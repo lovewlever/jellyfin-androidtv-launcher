@@ -240,6 +240,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         super.onActivityCreated(savedInstanceState);
         if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
+
+
         prepareOverlayFragment();
 
         //pre-load animations
@@ -314,7 +316,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     private void prepareOverlayFragment() {
         leanbackOverlayFragment = (LeanbackOverlayFragment) getChildFragmentManager().findFragmentById(R.id.leanback_fragment);
         if (leanbackOverlayFragment != null) {
-            leanbackOverlayFragment.setItemsToPlay(mItemsToPlay);
+            leanbackOverlayFragment.setItemsToPlay(mItemsToPlay.get(videoQueueManager.getValue().getCurrentMediaPosition()));
             leanbackOverlayFragment.initFromView(this);
             leanbackOverlayFragment.mediaInfoChanged();
             leanbackOverlayFragment.setOnKeyInterceptListener(keyListener);
