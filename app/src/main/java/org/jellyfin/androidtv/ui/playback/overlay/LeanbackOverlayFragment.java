@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.leanback.app.PlaybackSupportFragment;
 
 import org.jellyfin.androidtv.preference.UserPreferences;
@@ -32,7 +33,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     private Lazy<ImageLoader> imageLoader = inject(ImageLoader.class);
     private Lazy<ApiClient> api = inject(ApiClient.class);
     private Lazy<UserPreferences> userPreferences = inject(UserPreferences.class);
-    private AtomicReference<BaseItemDto> currentItem = new AtomicReference<>();;
+    private AtomicReference<BaseItemDto> currentItem = new AtomicReference<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,10 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment) {
         playerGlue.setInitialPlaybackDrawable();
         playerAdapter.setMasterOverlayFragment(customPlaybackOverlayFragment);
+    }
+
+    public void setParentFragment(Fragment fragment) {
+        playerGlue.setParentFragment(fragment);
     }
 
     public void setItemsToPlay(BaseItemDto currentIte) {

@@ -3,7 +3,10 @@ package org.jellyfin.androidtv.ui.playback;
 import static org.koin.java.KoinJavaComponent.inject;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -81,6 +84,7 @@ import org.jellyfin.sdk.model.api.ChapterInfo;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import kotlin.Lazy;
@@ -240,8 +244,6 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         super.onActivityCreated(savedInstanceState);
         if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
-
-
         prepareOverlayFragment();
 
         //pre-load animations
@@ -317,6 +319,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         leanbackOverlayFragment = (LeanbackOverlayFragment) getChildFragmentManager().findFragmentById(R.id.leanback_fragment);
         if (leanbackOverlayFragment != null) {
             leanbackOverlayFragment.setItemsToPlay(mItemsToPlay.get(videoQueueManager.getValue().getCurrentMediaPosition()));
+            leanbackOverlayFragment.setParentFragment(this);
             leanbackOverlayFragment.initFromView(this);
             leanbackOverlayFragment.mediaInfoChanged();
             leanbackOverlayFragment.setOnKeyInterceptListener(keyListener);

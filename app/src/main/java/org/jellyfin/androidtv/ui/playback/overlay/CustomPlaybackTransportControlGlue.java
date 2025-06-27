@@ -1,9 +1,11 @@
 package org.jellyfin.androidtv.ui.playback.overlay;
 
 import static org.jellyfin.androidtv.ui.playback.overlay.PlayingSelectionsViewKt.createPlayingSelectionsView;
+import static org.koin.java.KoinJavaComponent.inject;
 import static java.lang.Math.round;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.leanback.media.PlaybackTransportControlGlue;
 import androidx.leanback.widget.AbstractDetailsDescriptionPresenter;
 import androidx.leanback.widget.Action;
@@ -23,10 +26,16 @@ import androidx.leanback.widget.PlaybackTransportRowPresenter;
 import androidx.leanback.widget.PlaybackTransportRowView;
 import androidx.leanback.widget.RowPresenter;
 
+import com.google.common.eventbus.EventBus;
+
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.ClockBehavior;
+import org.jellyfin.androidtv.ui.navigation.Destinations;
+import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
+import org.jellyfin.androidtv.ui.playback.CustomPlaybackOverlayFragment;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
+import org.jellyfin.androidtv.ui.playback.VideoQueueManager;
 import org.jellyfin.androidtv.ui.playback.overlay.action.AndroidAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ChannelBarChannelAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ChapterAction;
@@ -47,11 +56,14 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.ZoomAction;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
 import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.sdk.model.api.BaseItemDto;
+import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicReference;
+
+import kotlin.Lazy;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -87,7 +99,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
     private LinearLayout mButtonRef;
 
+    private Fragment mParentFragment = null;
     private final AtomicReference<BaseItemDto> currentItem;
+    private final Lazy<VideoQueueManager> videoQueueManager = inject(VideoQueueManager.class);
 
     CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, AtomicReference<BaseItemDto> currentItem) {
         super(context, playerAdapter);
@@ -167,17 +181,27 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     bar.addView(rl, 0, rlp);
 
 
-                    // Remove bottom padding
-                    parent.setPadding(parent.getPaddingStart(), parent.getPaddingTop(), parent.getPaddingEnd(), 0);
-                    view.setPadding(
-                            view.getPaddingStart(),
-                            view.getPaddingTop(),
-                            view.getPaddingEnd(),
-                            0);
-                    // Add Episodes Playing Selections
-                    view.addView(createPlayingSelectionsView(context, currentItem, (integer, baseItemDto) -> {
-                        return null;
-                    }));
+                    if (currentItem.get().getType() == BaseItemKind.EPISODE) {
+                        // Remove bottom padding
+                        parent.setPadding(parent.getPaddingStart(), parent.getPaddingTop(), parent.getPaddingEnd(), 0);
+                        view.setPadding(
+                                view.getPaddingStart(),
+                                view.getPaddingTop(),
+                                view.getPaddingEnd(),
+                                0);
+                        // Add Episodes Playing Selections
+                        view.addView(createPlayingSelectionsView(context, currentItem, (itemsPosition, baseItemDtoList) -> {
+
+                            if (mParentFragment != null && mParentFragment instanceof CustomPlaybackOverlayFragment) {
+                                BaseItemDto dto = baseItemDtoList.get(itemsPosition);
+                                if (dto.getId() == currentItem.get().getId()) return null;
+                                videoQueueManager.getValue().setCurrentVideoQueue(baseItemDtoList);
+                                videoQueueManager.getValue().setCurrentMediaPosition(itemsPosition);
+                                ((CustomPlaybackOverlayFragment) mParentFragment).showNextUp(dto.getId());
+                            }
+                            return null;
+                        }));
+                    }
                 }
 
                 return vh;
@@ -245,6 +269,10 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     @Override
     protected void onCreateSecondaryActions(ArrayObjectAdapter secondaryActionsAdapter) {
         this.secondaryActionsAdapter = secondaryActionsAdapter;
+    }
+
+    public void setParentFragment(Fragment fragment) {
+        this.mParentFragment = fragment;
     }
 
     void addMediaActions() {

@@ -61,7 +61,7 @@ import java.util.concurrent.atomic.AtomicReference
 internal fun createPlayingSelectionsView(
 	context: Context,
 	currentItem: AtomicReference<BaseItemDto>,
-	onItemClicked: (Int, BaseItemDto) -> Unit?,
+	onItemClicked: (Int, List<BaseItemDto>) -> Unit?,
 ): ComposeView {
 	var viewHasFocused by mutableStateOf(false)
 	return ComposeView(context).apply {
@@ -86,7 +86,7 @@ private fun PlayingSelectionsView(
 	modifier: Modifier = Modifier,
 	viewHasFocused: Boolean,
 	currentItem: AtomicReference<BaseItemDto>,
-	onItemClicked: (Int, BaseItemDto) -> Unit?,
+	onItemClicked: (Int, List<BaseItemDto>) -> Unit?,
 ) {
 	val itemsToPlayStateList = remember { mutableStateListOf<BaseItemDto>() }
 	var first by remember { mutableStateOf(true) }
@@ -138,7 +138,7 @@ private fun PlayingSelectionsView(
 							true
 						}
 						if ((keyEvent.key == Key.Enter || keyEvent.key == Key.DirectionCenter) && keyEvent.type == KeyEventType.KeyUp) {
-							onItemClicked(index, item)
+							onItemClicked(index, itemsToPlayStateList.toList())
 							true
 						} else {
 							false
@@ -162,11 +162,11 @@ private fun PlayingSelectionsView(
 				)
 				Spacer(modifier = Modifier.height(2.dp))
 				val itemName = item.name
-				val s = item.parentIndexNumber?.toString() ?: ""
-				val e = item.indexNumber?.toString() ?: ""
-
+				val s = item.parentIndexNumber?.toString()?.let { "S${it.padStart(2, '0')}" }
+				val e = item.indexNumber?.toString()?.let { "E${it.padStart(2, '0')}" }
+				val se = if (s != null && e != null) "$s$e: " else if (s != null) "$s: " else if (e != null) "$e: " else ""
 				Text(
-					text = "S${s}E${e}: ${itemName}",
+					text = "${se}${itemName}",
 					color = if (item.id == currentItem.get().id) Color.Green else Color.White,
 					modifier = Modifier
 						.widthIn(max = 140.dp)
