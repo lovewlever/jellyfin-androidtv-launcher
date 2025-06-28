@@ -102,10 +102,13 @@ fun TopSlideAppList(
 						.focusable(true)
 						.focusGroup()
 				) {
-					itemsIndexed(appListVM.appList) { index, item ->
+					itemsIndexed(appListVM.appList, contentType = { index, item -> item.hashCode() }) { index, item ->
 						Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp).let {
-							if (index == 0 || index == 1) it.padding(start = 8.dp)
-							else if (index == (20 - 1) || index == (20 - 2)) it.padding(end = 8.dp) else it
+							when (index) {
+								0, 1 -> it.padding(start = 8.dp)
+								(appListVM.appList.lastIndex), (appListVM.appList.lastIndex - 1) -> it.padding(end = 8.dp)
+								else -> it
+							}
 						}) {
 							val focusRequester = remember { FocusRequester() }
 							var pressed by remember { mutableStateOf(false) }
@@ -118,12 +121,8 @@ fun TopSlideAppList(
 								}
 							}
 							Card(
-								onClick = {
-									//focusIndex = index
-									//focusRequester.requestFocus()
-								},
+								onClick = {},
 								modifier = Modifier
-									//.widthIn(min = 140.dp)
 									.onFocusChanged { state ->
 										pressed = state.isFocused
 									}
@@ -142,7 +141,6 @@ fun TopSlideAppList(
 												context.startActivity(intent2)
 											}
 											isActiveClose = true
-											//focusRequester.requestFocus()
 											true
 										} else {
 											false
@@ -150,19 +148,7 @@ fun TopSlideAppList(
 									}
 									.focusRequester(focusRequester)
 									.focusable()
-									.scale(scaleAnim)
-								/*.focusable(true)
-								.let {
-									if (focusIndex == index) it.focusRequester(focusRequester) else it
-								}
-								.onFocusChanged { focusState ->
-									Timber.d("\"FOCUS: \": ${index}; ${focusState.isFocused}")
-								},*/
-								/*elevation = CardDefaults.cardElevation(
-									defaultElevation = 12.dp,
-									focusedElevation = 24.dp,
-									pressedElevation = 24.dp
-								)*/,
+									.scale(scaleAnim),
 								colors = CardDefaults.cardColors(containerColor = Color(0xFF424242)),
 								shape = RoundedCornerShape(shapeRoundedDp)
 							) {
@@ -199,10 +185,7 @@ fun TopSlideAppList(
 						}
 					}
 				}
-
 			}
-
 		}
 	}
-
 }

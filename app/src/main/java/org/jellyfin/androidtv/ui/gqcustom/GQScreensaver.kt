@@ -50,7 +50,6 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 	val context = LocalContext.current
 	val coroutineScope = rememberCoroutineScope()
 
-	val hazeState = rememberHazeState()
 	var currentImageIndex by remember { mutableIntStateOf(0) }
 	val animRotation = remember { Animatable(0f) }
 	var imageSource by remember { mutableStateOf("") }
@@ -126,13 +125,6 @@ fun GQScreensaver(serverScreensaverHostUrlPrefix: String) {
 					)
 				}
 			}
-
-//			key("GQScreensaverBlur") {
-//				Box(modifier = Modifier
-//					.fillMaxSize()
-//					.background(color = Color.Transparent)
-//					.customBlurCompatible(hazeState = hazeState, blur = 20.dp))
-//			}
 
 			AnimatedContent(
 				imageSource,

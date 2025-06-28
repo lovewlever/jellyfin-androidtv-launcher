@@ -191,10 +191,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                                 0);
                         // Add Episodes Playing Selections
                         view.addView(createPlayingSelectionsView(context, currentItem, (itemsPosition, baseItemDtoList) -> {
-
                             if (mParentFragment != null && mParentFragment instanceof CustomPlaybackOverlayFragment) {
                                 BaseItemDto dto = baseItemDtoList.get(itemsPosition);
-                                if (dto.getId() == currentItem.get().getId()) return null;
+                                if (dto.getId().toString().equals(currentItem.get().getId().toString())) return null;
                                 videoQueueManager.getValue().setCurrentVideoQueue(baseItemDtoList);
                                 videoQueueManager.getValue().setCurrentMediaPosition(itemsPosition);
                                 ((CustomPlaybackOverlayFragment) mParentFragment).showNextUp(dto.getId());

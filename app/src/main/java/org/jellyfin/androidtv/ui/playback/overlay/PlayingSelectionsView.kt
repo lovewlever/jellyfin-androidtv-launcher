@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,22 +39,35 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColor
+import androidx.fragment.app.FragmentActivity
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.data.repository.ItemRepository
+import org.jellyfin.androidtv.preference.UserPreferences
+import org.jellyfin.androidtv.preference.constant.AppTheme
+import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.ui.preference.screen.UserPreferencesScreen
+import org.jellyfin.androidtv.util.ThemeViewModel
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemImages
+import org.jellyfin.androidtv.util.applyTheme
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import org.koin.compose.koinInject
 import java.util.concurrent.atomic.AtomicReference
+import androidx.core.graphics.toColorInt
+import timber.log.Timber
 
 /**
  * Provides the function of selecting episodes in the playback page
@@ -70,12 +84,14 @@ internal fun createPlayingSelectionsView(
 		this.onFocusChangeListener = OnFocusChangeListener { v, hasFocus -> viewHasFocused = hasFocus }
 
 		setContent {
-			PlayingSelectionsView(
-				modifier = Modifier.padding(top = 8.dp),
-				viewHasFocused = viewHasFocused,
-				currentItem = currentItem,
-				onItemClicked = onItemClicked
-			)
+			JellyfinTheme {
+				PlayingSelectionsView(
+					modifier = Modifier.padding(top = 8.dp),
+					viewHasFocused = viewHasFocused,
+					currentItem = currentItem,
+					onItemClicked = onItemClicked
+				)
+			}
 		}
 	}
 }
@@ -92,6 +108,16 @@ private fun PlayingSelectionsView(
 	var first by remember { mutableStateOf(true) }
 	val api = koinInject<ApiClient>()
 	val lazyRowState = rememberLazyListState()
+	val context = LocalContext.current
+
+	val composeColor = remember {
+		Timber.d("obtainStyledAttributes Color")
+		val attrs = context.obtainStyledAttributes(UserPreferences.appTheme.defaultValue.nameRes, intArrayOf(android.R.attr.colorAccent))
+		val color = attrs.getColor(0, "#FFFFFF".toColorInt())
+		val composeColor = Color(color)
+		attrs.recycle()
+		composeColor
+	}
 
 	LaunchedEffect(currentItem.get()) {
 		val byName = GetItemsRequest(
@@ -153,7 +179,10 @@ private fun PlayingSelectionsView(
 					)
 				}
 				AsyncImage(
-					model = spi,
+					model = ImageRequest.Builder(context)
+						.diskCachePolicy(CachePolicy.ENABLED)
+						.data(spi)
+						.build(),
 					contentDescription = "",
 					modifier = Modifier
 						.size(140.dp, 80.dp)
@@ -161,13 +190,14 @@ private fun PlayingSelectionsView(
 					contentScale = ContentScale.Crop
 				)
 				Spacer(modifier = Modifier.height(2.dp))
+
 				val itemName = item.name
 				val s = item.parentIndexNumber?.toString()?.let { "S${it.padStart(2, '0')}" }
 				val e = item.indexNumber?.toString()?.let { "E${it.padStart(2, '0')}" }
 				val se = if (s != null && e != null) "$s$e: " else if (s != null) "$s: " else if (e != null) "$e: " else ""
 				Text(
 					text = "${se}${itemName}",
-					color = if (item.id == currentItem.get().id) Color.Green else Color.White,
+					color =  if (item.id == currentItem.get().id) composeColor else Color.White,
 					modifier = Modifier
 						.widthIn(max = 140.dp)
 						.height(42.dp),
