@@ -17,8 +17,6 @@ import org.jellyfin.androidtv.ui.playback.PlaybackControllerContainer;
 import org.jellyfin.sdk.api.client.ApiClient;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import coil3.ImageLoader;
 import kotlin.Lazy;
 import timber.log.Timber;
@@ -32,7 +30,6 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     private final Lazy<ImageLoader> imageLoader = inject(ImageLoader.class);
     private final Lazy<ApiClient> api = inject(ApiClient.class);
     private final Lazy<UserPreferences> userPreferences = inject(UserPreferences.class);
-    private final AtomicReference<BaseItemDto> currentBaseItemDto = new AtomicReference<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +44,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
         }
 
         playerAdapter = new VideoPlayerAdapter(playbackController, this);
-        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController, currentBaseItemDto);
+        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController);
         playerGlue.setHost(new CustomPlaybackFragmentGlueHost(this));
     }
 
@@ -58,14 +55,10 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
         super.hideControlsOverlay(false);
     }
 
-    public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment) {
-        playerGlue.setMasterOverlayFragment(customPlaybackOverlayFragment);
+    public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment, BaseItemDto currentBaseItemDto) {
+        playerGlue.setMasterOverlayFragment(customPlaybackOverlayFragment, currentBaseItemDto);
         playerGlue.setInitialPlaybackDrawable();
         playerAdapter.setMasterOverlayFragment(customPlaybackOverlayFragment);
-    }
-
-    public void setCurrentPlayBaseItemDto(BaseItemDto currentBaseItemDto) {
-        this.currentBaseItemDto.set(currentBaseItemDto);
     }
 
     @Override

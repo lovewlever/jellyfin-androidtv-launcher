@@ -55,10 +55,8 @@ import org.koin.java.KoinJavaComponent;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import kotlin.Lazy;
-import timber.log.Timber;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -95,14 +93,12 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
     private LinearLayout mButtonRef;
 
     private Fragment customPlaybackOverlayFragment = null;
-    private final AtomicReference<BaseItemDto> currentBaseItemDto;
+    private BaseItemDto currentBaseItemDto = null;
     private final Lazy<VideoQueueManager> videoQueueManager = inject(VideoQueueManager.class);
 
-    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, AtomicReference<BaseItemDto> currentBaseItemDto) {
+    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController) {
         super(context, playerAdapter);
-
         this.playbackController = playbackController;
-        this.currentBaseItemDto = currentBaseItemDto;
         mRefreshEndTime = () -> {
             setEndTime();
             if (!isPlaying()) {
@@ -178,16 +174,16 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     rl.addView(mEndsText, rlp2);
                     bar.addView(rl, 0, rlp);
 
-                    if (currentBaseItemDto.get() != null
-                            && currentBaseItemDto.get().getType() == BaseItemKind.EPISODE) {
+                    if (currentBaseItemDto != null
+                            && currentBaseItemDto.getType() == BaseItemKind.EPISODE) {
                         // Remove bottom padding
                         parent.setPadding(parent.getPaddingStart(), parent.getPaddingTop(), parent.getPaddingEnd(), 0);
                         view.setPadding(view.getPaddingStart(), view.getPaddingTop(), view.getPaddingEnd(), 0);
                         // Add Episodes Playing Selections
-                        view.addView(createPlayingSelectionsView(context, currentBaseItemDto.get(), (itemsPosition, baseItemDtoList) -> {
+                        view.addView(createPlayingSelectionsView(context, currentBaseItemDto, (itemsPosition, baseItemDtoList) -> {
                             if (customPlaybackOverlayFragment != null && customPlaybackOverlayFragment instanceof CustomPlaybackOverlayFragment) {
                                 BaseItemDto dto = baseItemDtoList.get(itemsPosition);
-                                if (dto.getId().toString().equals(currentBaseItemDto.get().getId().toString())) return null;
+                                if (dto.getId().toString().equals(currentBaseItemDto.getId().toString())) return null;
                                 videoQueueManager.getValue().setCurrentVideoQueue(baseItemDtoList);
                                 videoQueueManager.getValue().setCurrentMediaPosition(itemsPosition);
                                 ((CustomPlaybackOverlayFragment) customPlaybackOverlayFragment).showNextUp(dto.getId());
@@ -264,8 +260,9 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         this.secondaryActionsAdapter = secondaryActionsAdapter;
     }
 
-    public void setMasterOverlayFragment(Fragment fragment) {
+    public void setMasterOverlayFragment(Fragment fragment, BaseItemDto currentBaseItemDto) {
         this.customPlaybackOverlayFragment = fragment;
+        this.currentBaseItemDto = currentBaseItemDto;
     }
 
     void addMediaActions() {
