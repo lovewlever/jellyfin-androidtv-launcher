@@ -20,6 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -67,14 +68,19 @@ import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import org.koin.compose.koinInject
 import java.util.concurrent.atomic.AtomicReference
 import androidx.core.graphics.toColorInt
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+
 
 /**
  * Provides the function of selecting episodes in the playback page
  */
 internal fun createPlayingSelectionsView(
 	context: Context,
-	currentItem: AtomicReference<BaseItemDto>,
+	currentItem: BaseItemDto,
 	onItemClicked: (Int, List<BaseItemDto>) -> Unit?,
 ): ComposeView {
 	var viewHasFocused by mutableStateOf(false)
@@ -101,7 +107,7 @@ internal fun createPlayingSelectionsView(
 private fun PlayingSelectionsView(
 	modifier: Modifier = Modifier,
 	viewHasFocused: Boolean,
-	currentItem: AtomicReference<BaseItemDto>,
+	currentItem: BaseItemDto,
 	onItemClicked: (Int, List<BaseItemDto>) -> Unit?,
 ) {
 	val itemsToPlayStateList = remember { mutableStateListOf<BaseItemDto>() }
@@ -111,7 +117,6 @@ private fun PlayingSelectionsView(
 	val context = LocalContext.current
 
 	val composeColor = remember {
-		Timber.d("obtainStyledAttributes Color")
 		val attrs = context.obtainStyledAttributes(UserPreferences.appTheme.defaultValue.nameRes, intArrayOf(android.R.attr.colorAccent))
 		val color = attrs.getColor(0, "#FFFFFF".toColorInt())
 		val composeColor = Color(color)
@@ -119,10 +124,10 @@ private fun PlayingSelectionsView(
 		composeColor
 	}
 
-	LaunchedEffect(currentItem.get()) {
+	LaunchedEffect(currentItem) {
 		val byName = GetItemsRequest(
 			fields = ItemRepository.itemFields,
-			parentId = currentItem.get().seasonId,
+			parentId = currentItem.seasonId,
 		)
 		val response = withContext(Dispatchers.IO) {
 			api.itemsApi.getItems(byName).content
@@ -130,7 +135,7 @@ private fun PlayingSelectionsView(
 		itemsToPlayStateList.clear()
 		itemsToPlayStateList.addAll(response.items)
 
-		itemsToPlayStateList.indexOfFirst { it.id == currentItem.get().id }.takeIf { it > 0 }?.let {
+		itemsToPlayStateList.indexOfFirst { it.id == currentItem.id }.takeIf { it > 0 }?.let {
 			lazyRowState.scrollToItem(it)
 		}
 	}
@@ -197,7 +202,7 @@ private fun PlayingSelectionsView(
 				val se = if (s != null && e != null) "$s$e: " else if (s != null) "$s: " else if (e != null) "$e: " else ""
 				Text(
 					text = "${se}${itemName}",
-					color =  if (item.id == currentItem.get().id) composeColor else Color.White,
+					color =  if (item.id == currentItem.id) composeColor else Color.White,
 					modifier = Modifier
 						.widthIn(max = 140.dp)
 						.height(42.dp),

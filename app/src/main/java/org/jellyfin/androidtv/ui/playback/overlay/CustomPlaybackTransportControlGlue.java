@@ -5,7 +5,6 @@ import static org.koin.java.KoinJavaComponent.inject;
 import static java.lang.Math.round;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
@@ -26,13 +25,9 @@ import androidx.leanback.widget.PlaybackTransportRowPresenter;
 import androidx.leanback.widget.PlaybackTransportRowView;
 import androidx.leanback.widget.RowPresenter;
 
-import com.google.common.eventbus.EventBus;
-
 import org.jellyfin.androidtv.R;
 import org.jellyfin.androidtv.preference.UserPreferences;
 import org.jellyfin.androidtv.preference.constant.ClockBehavior;
-import org.jellyfin.androidtv.ui.navigation.Destinations;
-import org.jellyfin.androidtv.ui.navigation.NavigationRepository;
 import org.jellyfin.androidtv.ui.playback.CustomPlaybackOverlayFragment;
 import org.jellyfin.androidtv.ui.playback.PlaybackController;
 import org.jellyfin.androidtv.ui.playback.VideoQueueManager;
@@ -54,7 +49,6 @@ import org.jellyfin.androidtv.ui.playback.overlay.action.SkipNextAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.SkipPreviousAction;
 import org.jellyfin.androidtv.ui.playback.overlay.action.ZoomAction;
 import org.jellyfin.androidtv.util.DateTimeExtensionsKt;
-import org.jellyfin.androidtv.util.Utils;
 import org.jellyfin.sdk.model.api.BaseItemDto;
 import org.jellyfin.sdk.model.api.BaseItemKind;
 import org.koin.java.KoinJavaComponent;
@@ -64,6 +58,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import kotlin.Lazy;
+import timber.log.Timber;
 
 public class CustomPlaybackTransportControlGlue extends PlaybackTransportControlGlue<VideoPlayerAdapter> {
 
@@ -99,14 +94,15 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
     private LinearLayout mButtonRef;
 
-    private Fragment mParentFragment = null;
-    private final AtomicReference<BaseItemDto> currentItem;
+    private Fragment customPlaybackOverlayFragment = null;
+    private final AtomicReference<BaseItemDto> currentBaseItemDto;
     private final Lazy<VideoQueueManager> videoQueueManager = inject(VideoQueueManager.class);
 
-    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, AtomicReference<BaseItemDto> currentItem) {
+    CustomPlaybackTransportControlGlue(Context context, VideoPlayerAdapter playerAdapter, PlaybackController playbackController, AtomicReference<BaseItemDto> currentBaseItemDto) {
         super(context, playerAdapter);
+
         this.playbackController = playbackController;
-        this.currentItem = currentItem;
+        this.currentBaseItemDto = currentBaseItemDto;
         mRefreshEndTime = () -> {
             setEndTime();
             if (!isPlaying()) {
@@ -140,6 +136,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
 
     @Override
     protected PlaybackRowPresenter onCreateRowPresenter() {
+
         final AbstractDetailsDescriptionPresenter detailsPresenter = new AbstractDetailsDescriptionPresenter() {
             @Override
             protected void onBindDescription(ViewHolder vh, Object item) {
@@ -149,6 +146,7 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         PlaybackTransportRowPresenter rowPresenter = new PlaybackTransportRowPresenter() {
             @Override
             protected RowPresenter.ViewHolder createRowViewHolder(ViewGroup parent) {
+
                 RowPresenter.ViewHolder vh = super.createRowViewHolder(parent);
 
                 ClockBehavior showClock = KoinJavaComponent.<UserPreferences>get(UserPreferences.class).get(UserPreferences.Companion.getClockBehavior());
@@ -180,23 +178,19 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
                     rl.addView(mEndsText, rlp2);
                     bar.addView(rl, 0, rlp);
 
-
-                    if (currentItem.get().getType() == BaseItemKind.EPISODE) {
+                    if (currentBaseItemDto.get() != null
+                            && currentBaseItemDto.get().getType() == BaseItemKind.EPISODE) {
                         // Remove bottom padding
                         parent.setPadding(parent.getPaddingStart(), parent.getPaddingTop(), parent.getPaddingEnd(), 0);
-                        view.setPadding(
-                                view.getPaddingStart(),
-                                view.getPaddingTop(),
-                                view.getPaddingEnd(),
-                                0);
+                        view.setPadding(view.getPaddingStart(), view.getPaddingTop(), view.getPaddingEnd(), 0);
                         // Add Episodes Playing Selections
-                        view.addView(createPlayingSelectionsView(context, currentItem, (itemsPosition, baseItemDtoList) -> {
-                            if (mParentFragment != null && mParentFragment instanceof CustomPlaybackOverlayFragment) {
+                        view.addView(createPlayingSelectionsView(context, currentBaseItemDto.get(), (itemsPosition, baseItemDtoList) -> {
+                            if (customPlaybackOverlayFragment != null && customPlaybackOverlayFragment instanceof CustomPlaybackOverlayFragment) {
                                 BaseItemDto dto = baseItemDtoList.get(itemsPosition);
-                                if (dto.getId().toString().equals(currentItem.get().getId().toString())) return null;
+                                if (dto.getId().toString().equals(currentBaseItemDto.get().getId().toString())) return null;
                                 videoQueueManager.getValue().setCurrentVideoQueue(baseItemDtoList);
                                 videoQueueManager.getValue().setCurrentMediaPosition(itemsPosition);
-                                ((CustomPlaybackOverlayFragment) mParentFragment).showNextUp(dto.getId());
+                                ((CustomPlaybackOverlayFragment) customPlaybackOverlayFragment).showNextUp(dto.getId());
                             }
                             return null;
                         }));
@@ -270,8 +264,8 @@ public class CustomPlaybackTransportControlGlue extends PlaybackTransportControl
         this.secondaryActionsAdapter = secondaryActionsAdapter;
     }
 
-    public void setParentFragment(Fragment fragment) {
-        this.mParentFragment = fragment;
+    public void setMasterOverlayFragment(Fragment fragment) {
+        this.customPlaybackOverlayFragment = fragment;
     }
 
     void addMediaActions() {

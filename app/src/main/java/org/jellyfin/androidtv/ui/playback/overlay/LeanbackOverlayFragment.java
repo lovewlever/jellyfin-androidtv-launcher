@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.leanback.app.PlaybackSupportFragment;
 
 import org.jellyfin.androidtv.preference.UserPreferences;
@@ -28,12 +27,12 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     private CustomPlaybackTransportControlGlue playerGlue;
     private VideoPlayerAdapter playerAdapter;
     private boolean shouldShowOverlay = true;
-    private Lazy<PlaybackControllerContainer> playbackControllerContainer = inject(PlaybackControllerContainer.class);
+    private final Lazy<PlaybackControllerContainer> playbackControllerContainer = inject(PlaybackControllerContainer.class);
     private final Lazy<UserSettingPreferences> userSettingPreferences = inject(UserSettingPreferences.class);
-    private Lazy<ImageLoader> imageLoader = inject(ImageLoader.class);
-    private Lazy<ApiClient> api = inject(ApiClient.class);
-    private Lazy<UserPreferences> userPreferences = inject(UserPreferences.class);
-    private AtomicReference<BaseItemDto> currentItem = new AtomicReference<>();
+    private final Lazy<ImageLoader> imageLoader = inject(ImageLoader.class);
+    private final Lazy<ApiClient> api = inject(ApiClient.class);
+    private final Lazy<UserPreferences> userPreferences = inject(UserPreferences.class);
+    private final AtomicReference<BaseItemDto> currentBaseItemDto = new AtomicReference<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,7 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
         }
 
         playerAdapter = new VideoPlayerAdapter(playbackController, this);
-        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController, currentItem);
+        playerGlue = new CustomPlaybackTransportControlGlue(getContext(), playerAdapter, playbackController, currentBaseItemDto);
         playerGlue.setHost(new CustomPlaybackFragmentGlueHost(this));
     }
 
@@ -60,16 +59,13 @@ public class LeanbackOverlayFragment extends PlaybackSupportFragment {
     }
 
     public void initFromView(CustomPlaybackOverlayFragment customPlaybackOverlayFragment) {
+        playerGlue.setMasterOverlayFragment(customPlaybackOverlayFragment);
         playerGlue.setInitialPlaybackDrawable();
         playerAdapter.setMasterOverlayFragment(customPlaybackOverlayFragment);
     }
 
-    public void setParentFragment(Fragment fragment) {
-        playerGlue.setParentFragment(fragment);
-    }
-
-    public void setItemsToPlay(BaseItemDto currentIte) {
-        this.currentItem.set(currentIte);
+    public void setCurrentPlayBaseItemDto(BaseItemDto currentBaseItemDto) {
+        this.currentBaseItemDto.set(currentBaseItemDto);
     }
 
     @Override

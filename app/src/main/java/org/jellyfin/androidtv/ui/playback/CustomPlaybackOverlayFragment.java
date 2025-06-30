@@ -3,10 +3,7 @@ package org.jellyfin.androidtv.ui.playback;
 import static org.koin.java.KoinJavaComponent.inject;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.AsyncTask;
@@ -84,7 +81,6 @@ import org.jellyfin.sdk.model.api.ChapterInfo;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import kotlin.Lazy;
@@ -179,6 +175,7 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         binding = VlcPlayerInterfaceBinding.inflate(inflater, container, false);
         binding.textClock.setVideoPlayer(true);
 
@@ -228,6 +225,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         if (playbackController != null) {
             playbackController.init(new VideoManager(requireActivity(), view, helper), this);
         }
+
+        onActivityCreatedCover();
     }
 
     @Override
@@ -239,9 +238,8 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
         mIsVisible = false;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+
+    public void onActivityCreatedCover() {
         if (mItemsToPlay == null || mItemsToPlay.isEmpty()) return;
 
         prepareOverlayFragment();
@@ -311,15 +309,13 @@ public class CustomPlaybackOverlayFragment extends Fragment implements LiveTvGui
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         requireActivity().getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
     }
 
     private void prepareOverlayFragment() {
         leanbackOverlayFragment = (LeanbackOverlayFragment) getChildFragmentManager().findFragmentById(R.id.leanback_fragment);
         if (leanbackOverlayFragment != null) {
-            leanbackOverlayFragment.setItemsToPlay(mItemsToPlay.get(videoQueueManager.getValue().getCurrentMediaPosition()));
-            leanbackOverlayFragment.setParentFragment(this);
+            leanbackOverlayFragment.setCurrentPlayBaseItemDto(mItemsToPlay.get(videoQueueManager.getValue().getCurrentMediaPosition()));
             leanbackOverlayFragment.initFromView(this);
             leanbackOverlayFragment.mediaInfoChanged();
             leanbackOverlayFragment.setOnKeyInterceptListener(keyListener);
