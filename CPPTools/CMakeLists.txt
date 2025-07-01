@@ -34,8 +34,19 @@ if (WIN32)
             include/Constants.h
             src/mobile/ScreensaverImageList.cpp
             include/mobile/ScreensaverImageList.h
+            src/desktop/HAOperate.cpp
+            include/desktop/HAOperate.h
+            src/desktop/HAMqtt.cpp
+            include/desktop/HAMqtt.h
+            src/desktop/WeatherAMapApi.cpp
+            include/desktop/WeatherAMapApi.h
+            include/httplib.h
+            include/desktop/IWeatherApi.h
+            include/desktop/WeatherData.h
+            src/desktop/DrogonWeatherController.cpp
+            include/desktop/DrogonWeatherController.h
 
-            )
+    )
     message("Platform: " "WIN32")
     message("IS_DEBUG: " ${CMAKE_BUILD_TYPE})
 
@@ -60,7 +71,8 @@ if (WIN32)
                 paho-mqtt3c
                 paho-mqtt3cs
                 paho-mqttpp3
-
+                libssl
+                libcrypto
         )
     else ()
         file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/release/*.dll)
@@ -72,6 +84,9 @@ if (WIN32)
                 paho-mqtt3c
                 paho-mqtt3cs
                 paho-mqttpp3
+                libssl
+                libcrypto
+
         )
     endif ()
 

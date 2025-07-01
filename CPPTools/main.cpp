@@ -7,6 +7,12 @@
 #include "include/desktop/DrogonServer.h"
 #include "mobile/ScreensaverImageList.h"
 #include "nlohmann/json.hpp"
+#include "desktop/HAOperate.h"
+#include "desktop/WeatherAMapApi.h"
+#include "openssl/err.h"
+#include "openssl/opensslv.h"
+#include "openssl/ssl.h"
+#include "openssl/types.h"
 
 using namespace drogon;
 
@@ -28,6 +34,11 @@ int main()
     //
     //ScreensaverImageList::getScreensaverLocalImageList();
     //return 0;
+
+    //std::cout << "Openssl Version: " << OPENSSL_VERSION_TEXT << std::endl;
+
+    //const auto haoPtr = HAOperate::create();
+    //haoPtr->start();
 
     const auto ds = std::make_unique<DrogonServer>();
     return ds->startServer(false);
