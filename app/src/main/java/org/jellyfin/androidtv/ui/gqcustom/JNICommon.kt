@@ -30,6 +30,8 @@ object JNICommon {
 
 	external fun getScreensaverRemoteImageList(): List<String>
 
+	external fun queryWeather(): GQWeatherData?
+
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	private const val UniqueWorkName = "ScreensaverImageUrlList"
