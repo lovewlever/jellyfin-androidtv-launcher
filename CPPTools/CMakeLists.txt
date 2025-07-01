@@ -53,11 +53,26 @@ if (WIN32)
     if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/debug/*.dll)
         file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
-        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares zlibd)
+        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares
+                zlibd
+                paho-mqtt3a
+                paho-mqtt3as
+                paho-mqtt3c
+                paho-mqtt3cs
+                paho-mqttpp3
+
+        )
     else ()
         file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/dll/release/*.dll)
         file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/)
-        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares zlib)
+        target_link_libraries(${PROJECT_NAME} PUBLIC drogon jsoncpp trantor brotlicommon brotlidec brotlienc cares
+                zlib
+                paho-mqtt3a
+                paho-mqtt3as
+                paho-mqtt3c
+                paho-mqtt3cs
+                paho-mqttpp3
+        )
     endif ()
 
 elseif (ANDROID)
