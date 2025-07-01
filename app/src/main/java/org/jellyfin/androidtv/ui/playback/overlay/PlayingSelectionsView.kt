@@ -128,12 +128,11 @@ private fun PlayingSelectionsView(
     }
 
     LaunchedEffect(currentItem) {
-        val byName = GetItemsRequest(
-            fields = ItemRepository.itemFields,
-            parentId = currentItem.seasonId,
-        )
         val response = withContext(Dispatchers.IO) {
-            api.itemsApi.getItems(byName).content
+            api.itemsApi.getItems(GetItemsRequest(
+				fields = ItemRepository.itemFields,
+				parentId = currentItem.seasonId,
+			)).content
         }
         itemsToPlayStateList.clear()
         itemsToPlayStateList.addAll(response.items)
