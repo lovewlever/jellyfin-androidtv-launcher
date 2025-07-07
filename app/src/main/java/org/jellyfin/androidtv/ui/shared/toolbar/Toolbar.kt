@@ -26,6 +26,7 @@ import org.jellyfin.androidtv.ui.base.Text
 import org.jellyfin.androidtv.ui.base.modifier.childFocusRestorer
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
 import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
+import org.jellyfin.androidtv.ui.gqcustom.GQWeather
 
 @Composable
 fun Logo(modifier: Modifier = Modifier) {
@@ -67,6 +68,8 @@ fun Toolbar(
 			color = Color.White,
 			modifier = Modifier.align(Alignment.CenterVertically)
 		)
+		Spacer(Modifier.width(24.dp))
+		GQWeather(modifier = Modifier.align(Alignment.CenterVertically))
 	}
 }
 

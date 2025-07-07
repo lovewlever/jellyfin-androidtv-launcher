@@ -10,6 +10,7 @@
 #include "mobile/HttpGQScreensaver.h"
 #include "mobile/ScreensaverImageList.h"
 #include "nlohmann/json.hpp"
+#include <fstream>
 
 
 /**
@@ -148,7 +149,7 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_downloadScreensaverRemoteImage
  * @return
  */
 extern "C"
-JNIEXPORT jobject JNICALL
+JNIEXPORT jint JNICALL
 Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_queryWeather(JNIEnv *env, jobject thiz)
 {
     const auto &serverUrl = Constants::getMobileServerUrl();
@@ -159,49 +160,85 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_queryWeather(JNIEnv *env, jobj
         try
         {
             const auto jsonObj = nlohmann::json::parse(respBody);
-            const auto city = jsonObj["city"].get<std::string>();
-            const auto weather = jsonObj["weather"].get<std::string>();
-            const auto temperature = jsonObj["temperature"].get<std::string>();
-            const auto temperatureFloat = jsonObj["temperatureFloat"].get<std::string>();
-            const auto humidity = jsonObj["humidity"].get<std::string>();
-            const auto humidityFloat = jsonObj["humidityFloat"].get<std::string>();
-            const auto winddirection = jsonObj["winddirection"].get<std::string>();
-            const auto windpower = jsonObj["windpower"].get<std::string>();
-            const auto reporttime = jsonObj["reporttime"].get<std::string>();
-
-            const auto weatherClass = env->FindClass("org/jellyfin/androidtv/ui/gqcustom/GQWeatherData");
-            const auto consMethodId = env->GetMethodID(weatherClass, "<init>", "()V");
-
-            const auto setCityMethodId = env->GetMethodID(weatherClass, "setCity", "(Ljava/lang/String;)V");
-            const auto setWeatherMethodId = env->GetMethodID(weatherClass, "setWeather", "(Ljava/lang/String;)V");
-            const auto setTemperatureMethodId = env->GetMethodID(weatherClass, "setTemperature", "(Ljava/lang/String;)V");
-            const auto setTemperatureFloatMethodId = env->GetMethodID(weatherClass, "setTemperatureFloat", "(Ljava/lang/String;)V");
-            const auto setHumidityMethodId = env->GetMethodID(weatherClass, "setHumidity", "(Ljava/lang/String;)V");
-            const auto setHumidityFloatMethodId = env->GetMethodID(weatherClass, "setHumidityFloat", "(Ljava/lang/String;)V");
-            const auto setWinddirectionMethodId = env->GetMethodID(weatherClass, "setWinddirection", "(Ljava/lang/String;)V");
-            const auto setWindpowerMethodId = env->GetMethodID(weatherClass, "setWindpower", "(Ljava/lang/String;)V");
-            const auto setReporttimeMethodId = env->GetMethodID(weatherClass, "setReporttime", "(Ljava/lang/String;)V");
-
-            const auto weatherObject = env->NewObject(weatherClass, consMethodId);
-
-            env->CallObjectMethod(weatherObject, setCityMethodId, env->NewStringUTF(city.c_str()));
-            env->CallObjectMethod(weatherObject, setWeatherMethodId, env->NewStringUTF(weather.c_str()));
-            env->CallObjectMethod(weatherObject, setTemperatureMethodId, env->NewStringUTF(temperature.c_str()));
-            env->CallObjectMethod(weatherObject, setTemperatureFloatMethodId, env->NewStringUTF(temperatureFloat.c_str()));
-            env->CallObjectMethod(weatherObject, setHumidityMethodId, env->NewStringUTF(humidity.c_str()));
-            env->CallObjectMethod(weatherObject, setHumidityFloatMethodId, env->NewStringUTF(humidityFloat.c_str()));
-            env->CallObjectMethod(weatherObject, setWinddirectionMethodId, env->NewStringUTF(winddirection.c_str()));
-            env->CallObjectMethod(weatherObject, setWindpowerMethodId, env->NewStringUTF(windpower.c_str()));
-            env->CallObjectMethod(weatherObject, setReporttimeMethodId, env->NewStringUTF(reporttime.c_str()));
-
-            return weatherObject;
+            const auto weatherFile = Constants::getMobilePackageCacheDirPath() + "/weather_cache.json";
+            std::fstream fs(weatherFile, std::ios::out | std::ios::trunc);
+            fs << jsonObj.dump();
+            fs.flush();
+            fs.close();
+            std::ostringstream oss{};
+            oss << "JNICommon_queryWeather: " << "天气保存成功: " << jsonObj.dump();
+            GLog::logD("JNICommon", oss.str().c_str());
+            return 0;
         } catch (const std::exception &e)
         {
-
+            std::ostringstream oss{};
+            oss << "JNICommon_queryWeather-ERROR: " << e.what();
+            GLog::logE("JNICommon", oss.str().c_str());
         }
-
     }
 
+    return -1;
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_getCacheWeather(JNIEnv *env, jobject thiz)
+{
+    try
+    {
+        const auto weatherFile = Constants::getMobilePackageCacheDirPath() + "/weather_cache.json";
+        std::unique_ptr<std::fstream> fsPtr{nullptr};
+        char buf[1024];
+        fsPtr = std::make_unique<std::fstream>(weatherFile, std::ios::in);
+        fsPtr->read(buf, sizeof(buf));
+        fsPtr->close();
+
+        const auto jsonObj = nlohmann::json::parse(buf);
+        std::ostringstream oss{};
+        oss << "JNICommon_getCacheWeather: " << jsonObj.dump();
+        GLog::logD("JNICommon", oss.str().c_str());
+
+        const auto city = jsonObj["city"].get<std::string>();
+        const auto weather = jsonObj["weather"].get<std::string>();
+        const auto temperature = jsonObj["temperature"].get<std::string>();
+        const auto temperatureFloat = jsonObj["temperatureFloat"].get<std::string>();
+        const auto humidity = jsonObj["humidity"].get<std::string>();
+        const auto humidityFloat = jsonObj["humidityFloat"].get<std::string>();
+        const auto winddirection = jsonObj["winddirection"].get<std::string>();
+        const auto windpower = jsonObj["windpower"].get<std::string>();
+        const auto reporttime = jsonObj["reporttime"].get<std::string>();
+
+        const auto weatherClass = env->FindClass("org/jellyfin/androidtv/ui/gqcustom/GQWeatherData");
+        const auto consMethodId = env->GetMethodID(weatherClass, "<init>", "()V");
+        const auto weatherObject = env->NewObject(weatherClass, consMethodId);
+
+        const auto setStrField = [&](const char *fieldName, const char *value)
+        {
+            if (jfieldID fieldId = env->GetFieldID(weatherClass, fieldName, "Ljava/lang/String;");
+                fieldId != nullptr)
+            {
+                jstring jStr = env->NewStringUTF(value);
+                env->SetObjectField(weatherObject, fieldId, jStr);
+                env->DeleteLocalRef(jStr);
+            }
+        };
+
+        setStrField("city", city.c_str());
+        setStrField("weather", weather.c_str());
+        setStrField("temperature", temperature.c_str());
+        setStrField("temperatureFloat", temperatureFloat.c_str());
+        setStrField("humidity", humidity.c_str());
+        setStrField("humidityFloat", humidityFloat.c_str());
+        setStrField("winddirection", winddirection.c_str());
+        setStrField("windpower", windpower.c_str());
+        setStrField("reporttime", reporttime.c_str());
+
+        return weatherObject;
+    } catch (const std::exception &e)
+    {
+        std::ostringstream oss{};
+        oss << "JNICommon_getCacheWeather-ERROR: " << e.what();
+    }
     return nullptr;
 }
 

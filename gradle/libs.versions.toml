@@ -40,6 +40,7 @@ markwon = "4.6.2"
 mockk = "1.14.4"
 slf4j-timber = "0.0.4"
 timber = "5.0.1"
+playServicesContextmanager = "9.4.0"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
@@ -127,6 +128,7 @@ android-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref =
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+play-services-contextmanager = { group = "com.google.android.gms", name = "play-services-contextmanager", version.ref = "playServicesContextmanager" }
 
 [bundles]
 acra = [

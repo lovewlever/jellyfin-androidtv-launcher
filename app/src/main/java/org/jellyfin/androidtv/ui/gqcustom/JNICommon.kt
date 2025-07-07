@@ -30,7 +30,9 @@ object JNICommon {
 
 	external fun getScreensaverRemoteImageList(): List<String>
 
-	external fun queryWeather(): GQWeatherData?
+	external fun queryWeather(): Int
+
+	external fun getCacheWeather(): GQWeatherData?
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,9 +60,13 @@ object JNICommon {
 	class CustomWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
 		override suspend fun doWork(): Result {
 			Timber.d("CustomWorker startWork")
+			val i = queryWeather()
+			Timber.d("CustomWorker weather: $i")
+			// val weather: GQWeatherData? = getCacheWeather()
+			// Timber.d("CustomWorker weather: $weather")
 			val jsonStr = queryScreensaverImageUrlList(hostName, hostPort)
 			// val download = downloadScreensaverRemoteImageListToLocalPath()
-			Timber.d("CustomWorker jsonStr: $jsonStr; DownloadToLocal: nullptr")
+			Timber.d("CustomWorker ScreensaverImageUrlList: $jsonStr; DownloadToLocal: nullptr")
 			return if(jsonStr.isNotEmpty()) {
 				Result.success()
 			} else {
