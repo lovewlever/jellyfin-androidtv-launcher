@@ -8,7 +8,7 @@
 | Added the function of setting as Launcher |      ✅      |
 | Added jump to system settings icon        |      ✅      |
 | Add APP list page                         |      ✅      |
-| Episodes: Playing Selections              |      ⏩      |
+| Episodes: Playing Selections              |      ✅      |
 | PiP                                       |      ❌      |
 
 | Special                                                                                                                                                          | Manufacturer |
@@ -18,7 +18,7 @@
 | ```config/drogon-config.yaml ```                                                                                                                                 |      ✅       |
 | When ```ScreensaverFolderPath``` is empty or the ```JellyfinCPPTools``` service is not started, the default Screen saver will be displayed.                      |      ✅       |
 | The port number is jellyfin server + 1. The port number of Jellyfin Server is 8096, so please fill in 8097 for ListenPort of ```JellyfinCPPTools``` config.      |      ✅       |
-| Show local weather                                                                                                                                               |      ⏩       |
+| Show local weather                                                                                                                                               |      ✅       |
 | Access Home assistant                                                                                                                                            |      ⏩       |
 
 ## Build
