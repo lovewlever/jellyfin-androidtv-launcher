@@ -7,6 +7,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 import timber.log.Timber
 import java.util.UUID
@@ -36,6 +39,8 @@ object JNICommon {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	private val _weatherFlow = MutableStateFlow<GQWeatherData?>(null)
+	val weatherFlow: StateFlow<GQWeatherData?> = _weatherFlow
 	private const val UniqueWorkName = "ScreensaverImageUrlList"
 	private var hostName: String = ""
 	private var hostPort: Int = 0
@@ -62,8 +67,12 @@ object JNICommon {
 			Timber.d("CustomWorker startWork")
 			val i = queryWeather()
 			Timber.d("CustomWorker weather: $i")
-			// val weather: GQWeatherData? = getCacheWeather()
-			// Timber.d("CustomWorker weather: $weather")
+			val weather: GQWeatherData? = getCacheWeather()
+			Timber.d("CustomWorker weather: $weather")
+			if (weather != null && i == 0) {
+				_weatherFlow.tryEmit(weather)
+			}
+
 			val jsonStr = queryScreensaverImageUrlList(hostName, hostPort)
 			// val download = downloadScreensaverRemoteImageListToLocalPath()
 			Timber.d("CustomWorker ScreensaverImageUrlList: $jsonStr; DownloadToLocal: nullptr")

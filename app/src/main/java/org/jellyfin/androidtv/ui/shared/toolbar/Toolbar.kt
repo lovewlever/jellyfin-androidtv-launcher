@@ -68,7 +68,7 @@ fun Toolbar(
 			color = Color.White,
 			modifier = Modifier.align(Alignment.CenterVertically)
 		)
-		Spacer(Modifier.width(24.dp))
+
 		GQWeather(modifier = Modifier.align(Alignment.CenterVertically))
 	}
 }
