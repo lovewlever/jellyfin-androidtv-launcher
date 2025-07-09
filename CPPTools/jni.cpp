@@ -188,15 +188,16 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_getCacheWeather(JNIEnv *env, j
     {
         const auto weatherFile = Constants::getMobilePackageCacheDirPath() + "/weather_cache.json";
         std::unique_ptr<std::fstream> fsPtr{nullptr};
-        char buf[1024];
+        std::ostringstream bufStream{};
         fsPtr = std::make_unique<std::fstream>(weatherFile, std::ios::in);
-        fsPtr->read(buf, sizeof(buf));
+        bufStream << fsPtr->rdbuf();
         fsPtr->close();
 
-        const auto jsonObj = nlohmann::json::parse(buf);
         std::ostringstream oss{};
-        oss << "JNICommon_getCacheWeather: " << jsonObj.dump();
+        oss << "JNICommon_getCacheWeather: " << bufStream.str();
         GLog::logD("JNICommon", oss.str().c_str());
+
+        const auto jsonObj = nlohmann::json::parse(bufStream.str());
 
         const auto city = jsonObj["city"].get<std::string>();
         const auto weather = jsonObj["weather"].get<std::string>();
@@ -238,6 +239,7 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_getCacheWeather(JNIEnv *env, j
     {
         std::ostringstream oss{};
         oss << "JNICommon_getCacheWeather-ERROR: " << e.what();
+        GLog::logE("JNICommon", oss.str().c_str());
     }
     return nullptr;
 }
