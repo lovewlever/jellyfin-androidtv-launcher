@@ -31,17 +31,17 @@ fun StartupToolbar(
 				)
 			}
 
-			IconButton(onClick = openSettings) {
-				Icon(
-					painter = painterResource(R.drawable.ic_settings),
-					contentDescription = stringResource(R.string.lbl_settings),
-				)
-			}
-
 			IconButton(onClick = { showTopSlideAppList.value = true }) {
 				Icon(
 					painter = painterResource(R.drawable.ic_apps),
 					contentDescription = "Apps",
+				)
+			}
+
+			IconButton(onClick = openSettings) {
+				Icon(
+					painter = painterResource(R.drawable.ic_settings),
+					contentDescription = stringResource(R.string.lbl_settings),
 				)
 			}
 

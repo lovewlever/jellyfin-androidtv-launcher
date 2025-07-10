@@ -20,7 +20,6 @@ void HAOperate::start()
 {
     std::cout << "HAOperate::start()" << std::endl;
     haMqttPtr->listen();
-
 }
 
 

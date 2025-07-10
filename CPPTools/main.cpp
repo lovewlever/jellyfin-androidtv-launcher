@@ -1,3 +1,5 @@
+#pragma once
+#define NOMINMAX
 #include <drogon/drogon.h>
 #include <mobile/HttpGQScreensaver.h>
 
@@ -16,6 +18,7 @@
 
 using namespace drogon;
 
+std::unique_ptr<HAOperate> haOperatePtr{nullptr};
 
 int main()
 {
@@ -37,8 +40,8 @@ int main()
 
     //std::cout << "Openssl Version: " << OPENSSL_VERSION_TEXT << std::endl;
 
-    //const auto haoPtr = HAOperate::create();
-    //haoPtr->start();
+    // haOperatePtr = HAOperate::create();
+    // haOperatePtr->start();
 
 
     const auto ds = std::make_unique<DrogonServer>();

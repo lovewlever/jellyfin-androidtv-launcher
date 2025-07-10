@@ -45,6 +45,8 @@ if (WIN32)
             include/desktop/WeatherData.h
             src/desktop/DrogonWeatherController.cpp
             include/desktop/DrogonWeatherController.h
+            include/desktop/HAMqttCallback.h
+            src/desktop/HAMqttCallback.cpp
 
     )
     message("Platform: " "WIN32")

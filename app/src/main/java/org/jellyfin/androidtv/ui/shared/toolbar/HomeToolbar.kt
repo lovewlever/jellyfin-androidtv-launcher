@@ -45,6 +45,13 @@ fun HomeToolbar(
 				)
 			}
 
+			IconButton(onClick = { showTopSlideAppList.value = true }) {
+				Icon(
+					painter = painterResource(R.drawable.ic_apps),
+					contentDescription = "Apps",
+				)
+			}
+
 			IconButton(onClick = openSettings) {
 				Icon(
 					painter = painterResource(R.drawable.ic_settings),
@@ -76,12 +83,6 @@ fun HomeToolbar(
 				}
 			}
 
-			IconButton(onClick = { showTopSlideAppList.value = true }) {
-				Icon(
-					painter = painterResource(R.drawable.ic_apps),
-					contentDescription = "Apps",
-				)
-			}
 
 			IconButton(onClick = { context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS)) }) {
 				Icon(
