@@ -52,6 +52,7 @@ import androidx.core.graphics.toColorInt
 import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
+import coil3.request.crossfade
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -60,13 +61,17 @@ import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.base.Text
+import org.jellyfin.androidtv.util.apiclient.albumPrimaryImage
 import org.jellyfin.androidtv.util.apiclient.getUrl
 import org.jellyfin.androidtv.util.apiclient.itemImages
+import org.jellyfin.androidtv.util.apiclient.parentBackdropImages
+import org.jellyfin.androidtv.util.apiclient.parentImages
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import org.koin.compose.koinInject
+import timber.log.Timber
 
 
 /**
@@ -129,6 +134,15 @@ private fun PlayingSelectionsView(
 		val composeColor = Color(color)
 		attrs.recycle()
 		composeColor
+	}
+
+	var coverAlternative by remember {
+		mutableStateOf(
+			currentItem
+				.parentImages
+				.takeIf { it.isNotEmpty() }
+				?.get(org.jellyfin.sdk.model.api.ImageType.THUMB)
+				?.getUrl(api))
 	}
 
 	LaunchedEffect(currentItem) {
@@ -216,31 +230,42 @@ private fun PlayingSelectionsView(
 				shape = cardShape,
 				colors = CardDefaults.cardColors(containerColor = Color.Transparent)
 			) {
-				val spi by remember {
+				var cover by remember {
 					mutableStateOf(
-						item.itemImages.takeIf { it.isNotEmpty() }
-							?.get(org.jellyfin.sdk.model.api.ImageType.PRIMARY)?.getUrl(api)
-					)
+						item
+							.itemImages
+							.takeIf { it.isNotEmpty() }
+							?.get(org.jellyfin.sdk.model.api.ImageType.PRIMARY)
+							?.getUrl(api))
 				}
+
+				var triedFallback by remember { mutableStateOf(false) }
+
 				Box(modifier = Modifier.size(150.dp, 90.dp)) {
 					AsyncImage(
 						model = ImageRequest.Builder(context)
 							.diskCachePolicy(CachePolicy.ENABLED)
-							.data(spi)
+							.data(cover)
+							.crossfade(true)
+							.listener(onError = { _, _ ->
+								if (!triedFallback) {
+									cover = coverAlternative
+									triedFallback = true
+								}
+							})
 							.build(),
 						contentDescription = "",
 						modifier = Modifier.fillMaxSize(),
 						contentScale = ContentScale.Crop
 					)
 
-					val itemName = item.name
 					val s = item.parentIndexNumber?.toString()?.let { "S${it.padStart(2, '0')}" }
 					val e = item.indexNumber?.toString()?.let { "E${it.padStart(2, '0')}" }
-					val se =
-						if (s != null && e != null) "$s$e: " else if (s != null) "$s: " else if (e != null) "$e: " else ""
+					val se = if (s != null && e != null) "$s$e: " else if (s != null) "$s: " else if (e != null) "$e: " else ""
+
 					Surface(color = Color.Black.copy(alpha = 0.5F), modifier = Modifier.align(Alignment.BottomStart)) {
 						Text(
-							text = "${se}${itemName}",
+							text = "${se}${item.name}",
 							modifier = Modifier
 								.fillMaxWidth()
 								.padding(horizontal = 4.dp)
