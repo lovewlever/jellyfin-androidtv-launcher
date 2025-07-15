@@ -32,7 +32,7 @@ fun HomeToolbar(
 	switchUsers: () -> Unit,
 	userImage: String? = null,
 ) {
-	var showTopSlideAppList = remember { mutableStateOf(false) }
+	val showTopSlideAppList = remember { mutableStateOf(false) }
 	val context = LocalContext.current
 
 	Toolbar {
@@ -49,13 +49,6 @@ fun HomeToolbar(
 				Icon(
 					painter = painterResource(R.drawable.ic_apps),
 					contentDescription = "Apps",
-				)
-			}
-
-			IconButton(onClick = openSettings) {
-				Icon(
-					painter = painterResource(R.drawable.ic_settings),
-					contentDescription = stringResource(R.string.lbl_settings),
 				)
 			}
 
@@ -83,6 +76,12 @@ fun HomeToolbar(
 				}
 			}
 
+			IconButton(onClick = openSettings) {
+				Icon(
+					painter = painterResource(R.drawable.ic_settings),
+					contentDescription = stringResource(R.string.lbl_settings),
+				)
+			}
 
 			IconButton(onClick = { context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS)) }) {
 				Icon(
