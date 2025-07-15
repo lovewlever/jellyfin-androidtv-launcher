@@ -246,7 +246,7 @@ private fun PlayingSelectionsView(
 								.padding(horizontal = 4.dp)
 								.padding(bottom = 2.dp),
 							overflow = TextOverflow.Ellipsis,
-							maxLines = 2,
+							maxLines = if (focused) 4 else 2,
 							style = MaterialTheme
 								.typography
 								.bodyMedium
