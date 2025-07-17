@@ -32,7 +32,7 @@ fun HomeToolbar(
 	switchUsers: () -> Unit,
 	userImage: String? = null,
 ) {
-	var showTopSlideAppList = remember { mutableStateOf(false) }
+	val showTopSlideAppList = remember { mutableStateOf(false) }
 	val context = LocalContext.current
 
 	Toolbar {
