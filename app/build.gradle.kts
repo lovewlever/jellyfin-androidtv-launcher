@@ -19,7 +19,6 @@ android {
 		applicationId = namespace
 		versionName = project.getVersionName()
 		versionCode = getVersionCode(versionName!!)
-		setProperty("archivesBaseName", "jellyfin-androidtv-v$versionName")
 	}
 
 	buildFeatures {
@@ -38,7 +37,7 @@ android {
 	}
 
 	buildTypes {
-		val release by getting {
+		release {
 			isMinifyEnabled = false
 
 			// Set package names used in various XML files
@@ -52,7 +51,7 @@ android {
 			buildConfigField("boolean", "DEVELOPMENT", "false")
 		}
 
-		val debug by getting {
+		debug {
 			// Use different application id to run release and debug at the same time
 			applicationIdSuffix = ".debug"
 
@@ -90,7 +89,9 @@ android {
 	}
 }
 
-val versionTxt by tasks.registering {
+base.archivesName.set("jellyfin-androidtv-v${project.getVersionName()}")
+
+tasks.register("versionTxt") {
 	val path = layout.buildDirectory.asFile.get().resolve("version.txt")
 
 	doLast {
