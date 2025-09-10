@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jellyfin.androidtv.ui.base.JellyfinTheme
 import org.jellyfin.androidtv.ui.composable.modifier.overscan
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -110,7 +111,13 @@ fun PlayerOverlayLayout(
 					)
 					.overscan(),
 			) {
-				controls()
+				JellyfinTheme(
+					colorScheme = JellyfinTheme.colorScheme.copy(
+						button = Color.Transparent
+					)
+				) {
+					controls()
+				}
 			}
 		}
 	}
@@ -157,8 +164,11 @@ fun rememberPlayerOverlayVisibility(
 	// to make sure popups keep the overlay visible
 	val windowInfo = LocalWindowInfo.current
 	visible = visible || !windowInfo.isWindowFocused
+
+	var previousIsWindowFocused by remember { mutableStateOf(windowInfo.isWindowFocused) }
 	LaunchedEffect(windowInfo.isWindowFocused) {
-		show()
+		if (windowInfo.isWindowFocused != previousIsWindowFocused) show()
+		previousIsWindowFocused = windowInfo.isWindowFocused
 	}
 
 	return PlayerOverlayVisibilityState(
