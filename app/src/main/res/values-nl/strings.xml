@@ -70,7 +70,7 @@
     <string name="lbl_loading_elipses">Laden…</string>
     <string name="msg_playback_not_allowed">Afspelen op dit moment niet toegestaan</string>
     <string name="msg_playback_restricted">De beheerder heeft afspelen van dit item tot bepaalde tijdstippen beperkt</string>
-    <string name="msg_playback_incompatible">Kan dit videoformaat niet afspelen</string>
+    <string name="msg_playback_incompatible">Kan deze beeldindeling niet afspelen</string>
     <string name="lbl_never">Nooit</string>
     <string name="msg_cannot_play_time">Kan dit item op dit moment niet afspelen</string>
     <string name="msg_cannot_play">Dit item kan niet afgespeeld worden</string>
@@ -111,12 +111,12 @@
     <string name="lbl_all_items">Alle items</string>
     <string name="lbl_sorted_by">gesorteerd op</string>
     <string name="lbl_from">van</string>
-    <string name="lbl_name">Naam</string>
+    <string name="lbl_name">Titel</string>
     <string name="lbl_date_added">Datum toegevoegd</string>
     <string name="lbl_premier_date">Premièredatum</string>
     <string name="lbl_critic_rating">Beoordeling critici</string>
-    <string name="lbl_rating">Beoordeling</string>
-    <string name="lbl_starting_with">"beginnend met namen die beginnen met"</string>
+    <string name="lbl_rating">Kijkwijzer</string>
+    <string name="lbl_starting_with">met titel beginnend met</string>
     <string name="lbl_display_preferences">Weergavevoorkeuren</string>
     <string name="lbl__continuing">Wordt vervolgd</string>
     <string name="lbl_ended">Afgelopen</string>
@@ -176,7 +176,7 @@
     <string name="lbl_now_playing_track">%1$s van %2$s</string>
     <string name="lbl_status">%1$s / %2$s</string>
     <string name="lbl_news">Nieuws</string>
-    <string name="lbl_album_name">Albumnaam</string>
+    <string name="lbl_album_name">Albumtitel</string>
     <string name="lbl_next_episode">Volgende aflevering</string>
     <string name="lbl_previous_episode">Vorige aflevering</string>
     <string name="lbl_sort_by">Sorteren op</string>
@@ -335,7 +335,7 @@
     <string name="lbl_special">Special</string>
     <string name="help">Help</string>
     <string name="add_user">Account toevoegen</string>
-    <string name="who_is_watching">Wie is er aan het kijken\?</string>
+    <string name="who_is_watching">Wie gaat er kijken?</string>
     <string name="no_user_warning">Er zijn geen accounts gevonden!
 \nVoeg een nieuw account toe met de knop \"Account toevoegen\".</string>
     <string name="welcome_content">Maak verbinding met je server om te beginnen.</string>
@@ -527,7 +527,7 @@
     <string name="clear_image_cache_content">Gebruikt: %1$s</string>
     <string name="clear_image_cache">Afbeeldingscache wissen</string>
     <string name="random">Willekeurig</string>
-    <string name="unreleased">Nog niet uitgebracht</string>
+    <string name="unreleased">Nog niet verschenen</string>
     <string name="pref_playback_advanced">Geavanceerde afspeelvoorkeuren</string>
     <string name="lbl_home">Startscherm</string>
     <string name="pref_screensaver_ageratingmax_zero">Alle leeftijden</string>
