@@ -13,7 +13,7 @@ import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import dev.chrisbanes.haze.materials.HazeMaterials
 
 @Composable
-fun Modifier.customBlur(blur: Dp = 10.dp): Modifier {
+fun Modifier.customBlur(blur: Dp = 8.dp): Modifier {
 	return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
 		this.blur(blur)
 	} else {

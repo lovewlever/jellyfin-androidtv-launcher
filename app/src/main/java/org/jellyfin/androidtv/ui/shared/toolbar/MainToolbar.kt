@@ -1,5 +1,7 @@
 package org.jellyfin.androidtv.ui.shared.toolbar
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusGroup
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,6 +20,7 @@ import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +40,8 @@ import org.jellyfin.androidtv.ui.base.button.Button
 import org.jellyfin.androidtv.ui.base.button.ButtonDefaults
 import org.jellyfin.androidtv.ui.base.button.IconButton
 import org.jellyfin.androidtv.ui.base.button.IconButtonDefaults
+import org.jellyfin.androidtv.ui.gqcustom.GQWeather
+import org.jellyfin.androidtv.ui.gqcustom.TopSlideAppList
 import org.jellyfin.androidtv.ui.navigation.ActivityDestinations
 import org.jellyfin.androidtv.ui.navigation.Destinations
 import org.jellyfin.androidtv.ui.navigation.NavigationRepository
@@ -84,6 +90,8 @@ private fun MainToolbar(
 		containerColor = JellyfinTheme.colorScheme.buttonActive,
 		contentColor = JellyfinTheme.colorScheme.onButtonActive,
 	)
+	val showTopSlideAppList = remember { mutableStateOf(false) }
+
 
 	Toolbar(
 		modifier = Modifier
@@ -116,6 +124,14 @@ private fun MainToolbar(
 						modifier = Modifier
 							.aspectRatio(1f)
 							.clip(IconButtonDefaults.Shape)
+					)
+				}
+
+
+				IconButton(onClick = { showTopSlideAppList.value = true }) {
+					Icon(
+						painter = painterResource(R.drawable.ic_apps),
+						contentDescription = "Apps",
 					)
 				}
 
@@ -167,8 +183,19 @@ private fun MainToolbar(
 					)
 				}
 
+				IconButton(onClick = { activity?.startActivity(Intent(Settings.ACTION_SETTINGS)) }) {
+					Icon(
+						painter = painterResource(R.drawable.ic_system_settings),
+						contentDescription = "System settings",
+					)
+				}
+
 				ToolbarClock()
+
+				GQWeather()
 			}
 		}
 	)
+
+	TopSlideAppList(showTopSlideAppList)
 }
