@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.core.content.getSystemService
-import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -27,6 +26,8 @@ import org.jellyfin.playback.core.backend.BasePlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaStream
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
 import org.jellyfin.playback.core.mediastream.mediaStream
+import org.jellyfin.playback.core.mediastream.mediatype.MediaType
+import org.jellyfin.playback.core.mediastream.mediatype.mediaType
 import org.jellyfin.playback.core.mediastream.normalizationGain
 import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PositionInfo
@@ -48,11 +49,14 @@ class ExoPlayerBackend(
 	companion object {
 		const val TS_SEARCH_BYTES_LM = TsExtractor.TS_PACKET_SIZE * 1800
 		const val TS_SEARCH_BYTES_HM = TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES
+		const val MEDIA_ITEM_COUNT_MAX = 10
 	}
 
 	private var currentStream: PlayableMediaStream? = null
 	private var subtitleView: SubtitleView? = null
-	private var audioPipeline = ExoPlayerAudioPipeline()
+	private val audioPipeline = ExoPlayerAudioPipeline()
+	private val audioAttributeState = AudioAttributeState()
+
 	private val exoPlayer by lazy {
 		val dataSourceFactory = DefaultDataSource.Factory(
 			context,
@@ -94,9 +98,6 @@ class ExoPlayerBackend(
 				})
 			})
 			.setMediaSourceFactory(mediaSourceFactory)
-			.setAudioAttributes(AudioAttributes.Builder().apply {
-				setUsage(C.USAGE_MEDIA)
-			}.build(), true)
 			.setPauseAtEndOfMediaItems(true)
 			.build()
 			.also { player ->
@@ -181,11 +182,13 @@ class ExoPlayerBackend(
 			setUri(stream.url)
 		}.build()
 
-		// Remove any old preloaded items (skips the first which is the playing item)
-		while (exoPlayer.mediaItemCount > 1) exoPlayer.removeMediaItem(0)
-		// Add new item
+		// Remove any excessive items from the start
+		while (exoPlayer.mediaItemCount > MEDIA_ITEM_COUNT_MAX - 1) exoPlayer.removeMediaItem(0)
+
+		// Add new item to the end of the media item list
 		exoPlayer.addMediaItem(mediaItem)
 
+		// Instruct exoplayer to prepare
 		exoPlayer.prepare()
 	}
 
@@ -195,14 +198,43 @@ class ExoPlayerBackend(
 
 		currentStream = stream
 
-		val streamIsPrepared = (0 until exoPlayer.mediaItemCount).any { index ->
+		var preparedItemIndex = (0 until exoPlayer.mediaItemCount).firstOrNull { index ->
 			exoPlayer.getMediaItemAt(index).mediaId == stream.hashCode().toString()
 		}
 
-		if (!streamIsPrepared) prepareItem(item)
+		// Prepare the item now if it doesn't exist yet
+		if (preparedItemIndex == null) {
+			prepareItem(item)
+			preparedItemIndex = exoPlayer.mediaItemCount - 1
+		}
 
+		// Seek to prepared media item
+		when (preparedItemIndex) {
+			exoPlayer.currentMediaItemIndex - 1 -> exoPlayer.seekToPreviousMediaItem()
+			exoPlayer.currentMediaItemIndex + 1 -> exoPlayer.seekToNextMediaItem()
+			exoPlayer.currentMediaItemIndex -> Unit
+			else -> exoPlayer.seekTo(preparedItemIndex, 0)
+		}
+
+		// Update audio attributes
+		val contentType = when (item.mediaType) {
+			MediaType.Video -> C.AUDIO_CONTENT_TYPE_MOVIE
+			MediaType.Audio -> C.AUDIO_CONTENT_TYPE_MUSIC
+			MediaType.Unknown -> C.AUDIO_CONTENT_TYPE_UNKNOWN
+		}
+
+		audioAttributeState.updateAudioAttributes(
+			builder = {
+				setContentType(contentType)
+				setUsage(C.USAGE_MEDIA)
+			},
+			onChange = { audioAttributes ->
+				exoPlayer.setAudioAttributes(audioAttributes, true)
+			}
+		)
+
+		// Enjoy!
 		Timber.i("Playing ${item.mediaStream?.url}")
-		exoPlayer.seekToNextMediaItem()
 		exoPlayer.play()
 	}
 
@@ -222,7 +254,7 @@ class ExoPlayerBackend(
 	}
 
 	override fun seekTo(position: Duration) {
-		if (!exoPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM)) {
+		if (!exoPlayer.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) || !exoPlayer.isCurrentMediaItemSeekable) {
 			Timber.w("Trying to seek but ExoPlayer doesn't support it for the current item")
 		}
 

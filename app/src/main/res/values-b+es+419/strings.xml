@@ -267,9 +267,6 @@
     <string name="pref_clock_display_browsing">Mientras navega</string>
     <string name="lbl_always">Siempre</string>
     <string name="pref_clock_display">Mostrar el reloj</string>
-    <string name="pref_default_rating">Tipo de clasificación predeterminado</string>
-    <string name="lbl_tomatoes">Tomates</string>
-    <string name="lbl_stars">Estrellas</string>
     <string name="watch_count_overflow">99+</string>
     <string name="lbl_playback_control_ends">Termina %1$s</string>
     <string name="lbl_sign_in">Por favor inicie sesión</string>
@@ -588,4 +585,5 @@
     <string name="lbl_still_watching_short">2 episodios o 60 minutos</string>
     <string name="lbl_still_watching_very_long">8 episodios o 240 minutos</string>
     <string name="pref_subtitles_bold">Texto ancho</string>
+    <string name="pref_subtitles_position">Desplazamiento desde la parte inferior</string>
 </resources>
