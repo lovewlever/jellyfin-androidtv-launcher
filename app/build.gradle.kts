@@ -1,6 +1,4 @@
 plugins {
-	id("org.jetbrains.kotlin.kapt")
-	kotlin("android")
 	alias(libs.plugins.aboutlibraries)
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.compose)
@@ -32,10 +30,10 @@ android {
 		isCoreLibraryDesugaringEnabled = true
 	}
 
-	kapt {
-		correctErrorTypes = true
-		useBuildCache = true
-	}
+//	kapt {
+//		correctErrorTypes = true
+//		useBuildCache = true
+//	}
 
 	buildTypes {
 		release {
