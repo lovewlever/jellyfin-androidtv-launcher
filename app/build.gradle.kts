@@ -180,8 +180,8 @@ dependencies {
 
 
 	implementation("androidx.compose.material3:material3:1.3.2")
-	implementation("dev.chrisbanes.haze:haze:1.6.4")
-	implementation("dev.chrisbanes.haze:haze-materials:1.6.4")
+	// implementation("dev.chrisbanes.haze:haze:1.6.4")
+	// implementation("dev.chrisbanes.haze:haze-materials:1.6.4")
 	implementation("com.github.Commit451.coil-transformations:transformations:3.0.0")
 	implementation("com.tencent.bugly:crashreport:latest.release")
 }

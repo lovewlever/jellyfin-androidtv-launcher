@@ -123,7 +123,7 @@ private fun PlayingSelectionsView(
 	val focusRequesterStateList = remember(itemsToPlayStateList.size) {
 		List(itemsToPlayStateList.size) { FocusRequester() }
 	}
-	val cardShape = remember { RoundedCornerShape(8.dp) }
+	val cardShape = remember { RoundedCornerShape(12.dp) }
 
 	val composeColor = remember {
 		val attrs = context.obtainStyledAttributes(
