@@ -9,11 +9,13 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -22,6 +24,12 @@ import androidx.media3.exoplayer.util.EventLogger
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.ts.TsExtractor
 import androidx.media3.ui.SubtitleView
+import io.github.peerless2012.ass.media.AssHandler
+import io.github.peerless2012.ass.media.factory.AssRenderersFactory
+import io.github.peerless2012.ass.media.kt.withAssMkvSupport
+import io.github.peerless2012.ass.media.parser.AssSubtitleParserFactory
+import io.github.peerless2012.ass.media.type.AssRenderType
+import io.github.peerless2012.ass.media.widget.AssSubtitleView
 import org.jellyfin.playback.core.backend.BasePlayerBackend
 import org.jellyfin.playback.core.mediastream.MediaStream
 import org.jellyfin.playback.core.mediastream.PlayableMediaStream
@@ -33,6 +41,7 @@ import org.jellyfin.playback.core.model.PlayState
 import org.jellyfin.playback.core.model.PositionInfo
 import org.jellyfin.playback.core.queue.QueueEntry
 import org.jellyfin.playback.core.support.PlaySupportReport
+import org.jellyfin.playback.core.timedevent.TimedEvent
 import org.jellyfin.playback.core.ui.PlayerSubtitleView
 import org.jellyfin.playback.core.ui.PlayerSurfaceView
 import org.jellyfin.playback.media3.exoplayer.support.getPlaySupportReport
@@ -56,6 +65,12 @@ class ExoPlayerBackend(
 	private var subtitleView: SubtitleView? = null
 	private val audioPipeline = ExoPlayerAudioPipeline()
 	private val audioAttributeState = AudioAttributeState()
+	private val timedEventState = TimedEventState()
+	private var lastKnownDuration: Duration? = null
+
+	private val assHandler by lazy {
+		AssHandler(AssRenderType.OVERLAY_OPEN_GL)
+	}
 
 	private val exoPlayer by lazy {
 		val dataSourceFactory = DefaultDataSource.Factory(
@@ -74,7 +89,14 @@ class ExoPlayerBackend(
 			setConstantBitrateSeekingAlwaysEnabled(true)
 		}
 
-		val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
+		val mediaSourceFactory = if (exoPlayerOptions.enableLibass) {
+			val assSubtitleParserFactory = AssSubtitleParserFactory(assHandler)
+			val assExtractorsFactory = extractorsFactory.withAssMkvSupport(assSubtitleParserFactory, assHandler)
+			DefaultMediaSourceFactory(dataSourceFactory, assExtractorsFactory).apply {
+				setSubtitleParserFactory(assSubtitleParserFactory)
+			}
+		} else DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
+
 		val renderersFactory = DefaultRenderersFactory(context).apply {
 			setEnableDecoderFallback(true)
 			setExtensionRendererMode(
@@ -83,9 +105,22 @@ class ExoPlayerBackend(
 					false -> DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
 				}
 			)
+		}.let { renderersFactory ->
+			if (exoPlayerOptions.enableLibass) AssRenderersFactory(assHandler, renderersFactory)
+			else renderersFactory
 		}
 
+		val loadControl = DefaultLoadControl.Builder()
+			.setBufferDurationsMs(
+				exoPlayerOptions.minBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MIN_BUFFER_MS,
+				exoPlayerOptions.maxBufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+				exoPlayerOptions.bufferForPlaybackDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+				exoPlayerOptions.bufferForPlaybackAfterRebufferDuration?.inWholeMilliseconds?.toInt() ?: DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS,
+			)
+			.build()
+
 		ExoPlayer.Builder(context)
+			.setLoadControl(loadControl)
 			.setRenderersFactory(renderersFactory)
 			.setTrackSelector(DefaultTrackSelector(context).apply {
 				setParameters(buildUponParameters().apply {
@@ -105,6 +140,10 @@ class ExoPlayerBackend(
 
 				if (exoPlayerOptions.enableDebugLogging) {
 					player.addAnalyticsListener(EventLogger())
+				}
+
+				if (exoPlayerOptions.enableLibass) {
+					assHandler.init(player)
 				}
 			}
 	}
@@ -151,6 +190,17 @@ class ExoPlayerBackend(
 			val queueEntry = mediaItem?.localConfiguration?.tag as? QueueEntry
 			audioPipeline.normalizationGain = queueEntry?.normalizationGain
 		}
+
+		override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+			val duration = exoPlayer.duration.takeUnless { it == C.TIME_UNSET }?.milliseconds
+			if (duration == lastKnownDuration) return
+			timedEventState.onDurationChange(exoPlayer, duration)
+			lastKnownDuration = duration
+		}
+
+		override fun onPositionDiscontinuity(oldPosition: Player.PositionInfo, newPosition: Player.PositionInfo, reason: Int) {
+			timedEventState.onSeek(oldPosition.positionMs.milliseconds, newPosition.positionMs.milliseconds, lastKnownDuration ?: Duration.ZERO)
+		}
 	}
 
 	override fun supportsStream(
@@ -164,7 +214,11 @@ class ExoPlayerBackend(
 	override fun setSubtitleView(surfaceView: PlayerSubtitleView?) {
 		if (surfaceView != null) {
 			if (subtitleView == null) {
-				subtitleView = SubtitleView(surfaceView.context)
+				subtitleView = SubtitleView(surfaceView.context).apply {
+					if (exoPlayerOptions.enableLibass) {
+						addView(AssSubtitleView(surfaceView.context, assHandler))
+					}
+				}
 			}
 
 			surfaceView.addView(subtitleView)
@@ -276,6 +330,10 @@ class ExoPlayerBackend(
 	override fun getPositionInfo(): PositionInfo = PositionInfo(
 		active = exoPlayer.currentPosition.milliseconds,
 		buffer = exoPlayer.bufferedPosition.milliseconds,
-		duration = if (exoPlayer.duration == C.TIME_UNSET) Duration.ZERO else exoPlayer.duration.milliseconds,
+		duration = lastKnownDuration ?: Duration.ZERO,
 	)
+
+	override fun setTimedEvents(timedEvents: List<TimedEvent>) {
+		timedEventState.setTimedEvents(exoPlayer, timedEvents)
+	}
 }

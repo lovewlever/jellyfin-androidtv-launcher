@@ -30,10 +30,26 @@ android {
 		isCoreLibraryDesugaringEnabled = true
 	}
 
-//	kapt {
-//		correctErrorTypes = true
-//		useBuildCache = true
-//	}
+	signingConfigs {
+		val keystoreFile = getProperty("keystore.file")
+		val keystorePassword = getProperty("keystore.password")
+		val signingKeyAlias = getProperty("signing.key.alias")
+		val signingKeyPassword = getProperty("signing.key.password")
+
+		if (keystoreFile != null && keystorePassword != null && signingKeyAlias != null && signingKeyPassword != null) {
+			create("release") {
+				storeFile = file(keystoreFile)
+				storePassword = keystorePassword
+				keyAlias = signingKeyAlias
+				keyPassword = signingKeyPassword
+			}
+		}
+	}
+
+	dependenciesInfo {
+		includeInBundle = false
+		includeInApk = false
+	}
 
 	buildTypes {
 		release {
@@ -48,6 +64,8 @@ android {
 			resValue("string", "app_name", "@string/app_name_release")
 
 			buildConfigField("boolean", "DEVELOPMENT", "false")
+
+			signingConfig = signingConfigs.findByName("release")
 		}
 
 		debug {
@@ -153,6 +171,7 @@ dependencies {
 	implementation(libs.androidx.media3.exoplayer.hls)
 	implementation(libs.androidx.media3.ui)
 	implementation(libs.jellyfin.androidx.media3.ffmpeg.decoder)
+	implementation(libs.libass.media3)
 
 	// Markdown
 	implementation(libs.bundles.markwon)
