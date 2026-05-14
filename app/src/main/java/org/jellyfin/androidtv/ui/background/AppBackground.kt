@@ -37,7 +37,9 @@ import org.jellyfin.androidtv.ui.gqcustom.customBlur
 import org.koin.compose.koinInject
 
 @Composable
-private fun AppThemeBackground() {
+private fun AppThemeBackground(
+	blurBackground: Boolean
+) {
 	val context = LocalContext.current
 	var themeBackground by remember {
 		mutableStateOf<ImageBitmap?>(null)
@@ -68,7 +70,7 @@ private fun AppThemeBackground() {
 				contentDescription = null,
 				alignment = Alignment.Center,
 				contentScale = ContentScale.Crop,
-				modifier = Modifier.fillMaxSize().customBlur()
+				modifier = Modifier.fillMaxSize().then(if (blurBackground) Modifier.customBlur() else Modifier)
 			)
 		} else {
 			Box(
@@ -112,7 +114,7 @@ fun AppBackground(
 						.then(if (blurBackground) Modifier.customBlur() else Modifier)
 				)
 			} else {
-				AppThemeBackground()
+				AppThemeBackground(blurBackground)
 			}
 		}
 	}

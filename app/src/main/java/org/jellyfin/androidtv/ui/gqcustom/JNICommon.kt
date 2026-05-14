@@ -1,6 +1,7 @@
 package org.jellyfin.androidtv.ui.gqcustom
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -15,6 +16,7 @@ import timber.log.Timber
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+@Keep
 object JNICommon {
 
 	init {

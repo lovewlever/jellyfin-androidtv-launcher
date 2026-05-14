@@ -1,16 +1,21 @@
 package org.jellyfin.androidtv.ui.gqcustom
 
-class GQWeatherData {
-	var city: String = ""
-	var weather: String = ""
-	var temperature: String = ""
-	var temperatureFloat: String = ""
-	var humidity: String = ""
-	var humidityFloat: String = ""
-	var winddirection: String = ""
-	var windpower: String = ""
-	var reporttime: String = ""
+import androidx.annotation.Keep
+import java.io.Serializable
 
+@Keep
+class GQWeatherData: Serializable {
+	@Keep var city: String = ""
+	@Keep var weather: String = ""
+	@Keep var temperature: String = ""
+	@Keep var temperatureFloat: String = ""
+	@Keep var humidity: String = ""
+	@Keep var humidityFloat: String = ""
+	@Keep var winddirection: String = ""
+	@Keep var windpower: String = ""
+	@Keep var reporttime: String = ""
+
+	@Keep
 	override fun toString(): String {
 		return "city: $city\n" +
 				"weather: $weather\n" +
