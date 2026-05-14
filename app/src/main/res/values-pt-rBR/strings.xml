@@ -628,4 +628,6 @@
     <string name="pref_playback_inactivity_prompt">Aviso de inatividade</string>
     <string name="backdrop_behavior_with_blur">Fundo com desfoque</string>
     <string name="backdrop_behavior_without_blur">Fundo sem desfoque</string>
+    <string name="playback_buffer_auto">Auto</string>
+    <string name="playback_buffer_large">Grande</string>
 </resources>
