@@ -89,7 +89,7 @@
     <string name="lbl_today">Aujourd\'hui</string>
     <string name="lbl_tomorrow">Demain</string>
     <string name="lbl_on">On</string>
-    <string name="lbl_tune_to_channel">Aller sur la chaîne</string>
+    <string name="lbl_tune_to_channel">Regarder la chaîne</string>
     <string name="msg_recording_now">Enregistrement en cours</string>
     <string name="msg_will_record">Enregistrement prévu</string>
     <string name="lbl_begin_padding">Padding de début (minutes)</string>
@@ -622,7 +622,7 @@
     <string name="color_presets">Couleurs par défaut</string>
     <string name="color_custom">Personnaliser les couleurs</string>
     <string name="color_alpha">Transparence</string>
-    <string name="playback_video_player">Lecteur Vidéo</string>
+    <string name="playback_video_player">Lecteur vidéo</string>
     <string name="video_player_internal">Lecteur vidéo intégré</string>
     <string name="video_player_external">Lecteur vidéo externe</string>
     <string name="playback_video_player_external_empty">Vous n\'avez aucune application de lecture vidéo installée sur votre appareil qui peut lire les vidéos de Jellyfin.</string>
@@ -652,4 +652,22 @@
     <string name="hdr10">HDR10</string>
     <string name="pref_burn_subtitles_when_transcoding">Incrustation des sous-titres lors du transcodage</string>
     <string name="pref_burn_subtitles_when_transcoding_description">Toujours incorporer les sous-titres à la vidéo lors du transcodage. Cela peut résoudre les problèmes de synchronisation, mais désactive la personnalisation des sous-titres.</string>
+    <string name="playback_info">Information de lecture</string>
+    <string name="playback_info_play_method">Méthode de lecture : %1$s</string>
+    <string name="playback_info_direct_play">Lecture directe</string>
+    <string name="playback_info_direct_stream">Flux direct</string>
+    <string name="playback_info_container">Conteneur : %1$s</string>
+    <string name="playback_info_video_title">Vidéo</string>
+    <string name="playback_info_transcoding">Transcodage</string>
+    <string name="playback_info_audio_title">Audio</string>
+    <string name="playback_info_codec">Codec : %1$s</string>
+    <string name="playback_info_resolution">Resolution : %1$dx%2$d</string>
+    <string name="playback_info_bitrate">Bitrate : %1$s</string>
+    <string name="playback_info_channels">Chaînes : %1$d</string>
+    <string name="playback_info_video_range">Plage vidéo : %1$s</string>
+    <string name="playback_info_transcoding_note">Le serveur est en train de transcoder ce fichier</string>
+    <string name="playback_buffer_length">Taille de la mémoire tampon</string>
+    <string name="playback_buffer_auto">Auto</string>
+    <string name="playback_buffer_large">Grand</string>
+    <string name="playback_buffer_extra_large">Très grand</string>
 </resources>

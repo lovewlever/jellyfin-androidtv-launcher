@@ -104,7 +104,7 @@
     <string name="pref_audio_direct">Direct</string>
     <string name="pref_audio_compat">Downmixen naar stereo</string>
     <string name="lbl_audio_output">Geluidsuitgang</string>
-    <string name="lbl_goto_series">Naar serie gaan</string>
+    <string name="lbl_goto_series">Naar serie</string>
     <string name="lbl_enable_debug">Opties voor foutopsporing</string>
     <string name="desc_debug">Toon extra informatie voor foutopsporing</string>
     <string name="lbl_showing">Toont</string>
@@ -299,7 +299,7 @@
     <string name="pref_developer_link_description">Geavanceerde en experimentele functies</string>
     <string name="user_picker_last_user_summary">Gebruik het laatst actieve account</string>
     <string name="user_picker_last_user_title">Meest recent gebruikt</string>
-    <string name="user_picker_disable_summary">Aanmeldscherm altijd tonen</string>
+    <string name="user_picker_disable_summary">Altijd het aanmeldscherm tonen</string>
     <string name="user_picker_disable_title">Uitschakelen</string>
     <string name="auto_sign_in">Automatisch aanmelden</string>
     <string name="lbl_use_series_thumbnails_description">Serieminiatuur gebruiken bij weergeven van afleveringen</string>
@@ -351,8 +351,8 @@
     <string name="home_section_none">Geen</string>
     <string name="home_section_livetv">Live-tv</string>
     <string name="home_section_active_recordings">Actieve opnames</string>
-    <string name="home_section_resume_audio">Verder luisteren</string>
-    <string name="home_section_resume">Verder kijken</string>
+    <string name="home_section_resume_audio">Verderluisteren</string>
+    <string name="home_section_resume">Verderkijken</string>
     <string name="home_section_library">Mijn media</string>
     <string name="home_section_latest_media">Onlangs toegevoegde media</string>
     <string name="license_license">Licentie</string>
@@ -660,4 +660,6 @@
     <string name="playback_info_channels">Kanalen: %1$d</string>
     <string name="playback_info_video_range">Beeldbereik: %1$s</string>
     <string name="playback_info_transcoding_note">Server transcodeert dit bestand</string>
+    <string name="pref_software_codecs_enabled">Software-codecs gebruiken</string>
+    <string name="pref_software_codecs_enabled_description">Sommige softwarematige implementaties kunnen de prestaties verminderen. Het uitschakelen van deze optie vergroot de kans dat media moet worden getranscodeerd.</string>
 </resources>

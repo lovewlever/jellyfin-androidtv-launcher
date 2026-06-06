@@ -654,4 +654,12 @@
     <string name="playback_info_audio_title">Audio</string>
     <string name="playback_info_transcoding">Transkodierung</string>
     <string name="playback_info_container">Container: %1$s</string>
+    <string name="playback_info">Wiedergabeinformationen</string>
+    <string name="playback_info_play_method">Wiedergabemethode: %1$s</string>
+    <string name="playback_info_direct_play">Direkte Wiedergabe</string>
+    <string name="playback_info_direct_stream">Direktes Streaming</string>
+    <string name="playback_info_video_title">Video</string>
+    <string name="playback_info_video_range">Videosignalbereich: %1$s</string>
+    <string name="pref_software_codecs_enabled">Nutze Software-Codecs</string>
+    <string name="pref_software_codecs_enabled_description">Einige softwarebasierte Implementierungen können die Leistung beeinträchtigen. Wenn Sie diese Option deaktivieren, wird eine Transkodierung wahrscheinlicher.</string>
 </resources>
