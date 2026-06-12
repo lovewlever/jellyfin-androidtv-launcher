@@ -581,7 +581,6 @@
     <string name="indicator_subtitles_hearing_impaired">SDH</string>
     <string name="fast_forward">Rychlý posun vpřed</string>
     <string name="rewind">Rychlý posun zpět</string>
-    <string name="preference_enable_libass">Povolit vykreslování titulků Advanced SubStation Alpha na straně klienta</string>
     <string name="preference_enable_pgs">Přímo přehrávat titulky PGS</string>
     <string name="speech_error_unknown">Během rozpoznávání řeči došlo k neočekávané chybě.</string>
     <string name="pref_subtitles_bold">Tučný text</string>
@@ -672,4 +671,7 @@
     <string name="playback_info_transcoding_note">Server provádí překódování tohoto souboru</string>
     <string name="pref_software_codecs_enabled">Použít softwarové kodeky</string>
     <string name="pref_software_codecs_enabled_description">Některé softwarové implementace mohou snižovat výkon. Zakázání této možnosti zvýší pravděpodobnost překódování.</string>
+    <string name="preference_enable_ass">Přímo přehrávat titulky ASS</string>
+    <string name="preference_enable_pgs_description">Při zakázání vyžaduje překódování</string>
+    <string name="preference_enable_ass_description">Experimentální funkce, nemusí fungovat spolehlivě</string>
 </resources>

@@ -150,7 +150,7 @@
     <string name="lbl_play_from_here">Vanaf hier afspelen</string>
     <string name="lbl_remove_from_queue">Verwijderen uit wachtrij</string>
     <string name="lbl_goto_now_playing">Naar nu afspelen gaan</string>
-    <string name="lbl_instant_mix">Instant mix</string>
+    <string name="lbl_instant_mix">Snelmix</string>
     <string name="lbl_delete">Verwijderen</string>
     <string name="msg_item_added">" item toegevoegd"</string>
     <string name="desc_automatic_fav_songs">Automatische afspeellijst van favoriete nummers</string>
@@ -571,7 +571,6 @@
     <string name="indicator_subtitles_hearing_impaired">ODS</string>
     <string name="rewind">Terugspoelen</string>
     <string name="fast_forward">Vooruitspoelen</string>
-    <string name="preference_enable_libass">Client-rendering van Advanced SubStation Alpha-ondertiteling inschakelen</string>
     <string name="lbl_from_beginning">Vanaf begin afspelen</string>
     <string name="speech_error_unknown">Er is een onverwachte fout opgetreden bij de spraakherkenning.</string>
     <string name="speech_error_no_permission">Geen toestemming om de microfoon te gebruiken. Schakel deze in via de systeeminstellingen.</string>
@@ -662,4 +661,7 @@
     <string name="playback_info_transcoding_note">Server transcodeert dit bestand</string>
     <string name="pref_software_codecs_enabled">Software-codecs gebruiken</string>
     <string name="pref_software_codecs_enabled_description">Sommige softwarematige implementaties kunnen de prestaties verminderen. Het uitschakelen van deze optie vergroot de kans dat media moet worden getranscodeerd.</string>
+    <string name="preference_enable_ass">ASS-ondertiteling direct afspelen</string>
+    <string name="preference_enable_pgs_description">Vereist transcoderen indien uitgeschakeld</string>
+    <string name="preference_enable_ass_description">Experimentele functie, mogelijk onbetrouwbaar</string>
 </resources>

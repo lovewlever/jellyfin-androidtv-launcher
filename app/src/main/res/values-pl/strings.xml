@@ -591,7 +591,6 @@
     <string name="indicator_subtitles_hearing_impaired">SDH</string>
     <string name="rewind">Przewiń do tyłu</string>
     <string name="fast_forward">Przewiń do przodu</string>
-    <string name="preference_enable_libass">Włącz renderowanie napisów klienta Advanced SubStation Alpha</string>
     <string name="speech_error_no_permission">Brak uprawnień do korzystania z mikrofonu. Włącz je w ustawieniach systemu.</string>
     <string name="speech_error_unknown">Wystąpił nieoczekiwany błąd podczas rozpoznawania mowy.</string>
     <string name="lbl_from_beginning">Odtwórz od początku</string>
@@ -682,4 +681,7 @@
     <string name="playback_info_transcoding_note">Serwer transkoduje ten plik</string>
     <string name="pref_software_codecs_enabled">Użyj kodeków programowych</string>
     <string name="pref_software_codecs_enabled_description">Niektóre implementacje programowe mogą obniżać wydajność. Wyłączenie tej opcji zwiększa prawdopodobieństwo transkodowania.</string>
+    <string name="preference_enable_ass">Bezpośrednie odtwarzanie napisów ASS</string>
+    <string name="preference_enable_pgs_description">Wymaga transkodowania po wyłączeniu</string>
+    <string name="preference_enable_ass_description">Funkcja eksperymentalna, może nie działać niezawodnie</string>
 </resources>

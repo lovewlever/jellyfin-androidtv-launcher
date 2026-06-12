@@ -583,7 +583,6 @@
     <string name="lbl_still_watching_long">5 epizód vagy 150 perc</string>
     <string name="lbl_still_watching_very_long">8 epizód vagy 240 perc</string>
     <string name="fast_forward">Gyors előretekerés</string>
-    <string name="preference_enable_libass">Az Advancedt SubStation Alpha kliens renderelés aktiválása</string>
     <string name="still_watching_label">Még mindig figyel?</string>
     <string name="pref_subtitles_position">Alsó eltolás</string>
     <string name="settings">Beállítások</string>
@@ -660,4 +659,9 @@
     <string name="codec_level_4_2">4.2 szint</string>
     <string name="codec_level_4_1">4.1 szint</string>
     <string name="codec_level_4_0">4.0 szint</string>
+    <string name="preference_enable_ass">Közvetlen ASS felirat lejátszás</string>
+    <string name="preference_enable_pgs_description">Letiltás esetén átkódolást igényel</string>
+    <string name="preference_enable_ass_description">Kísérleti funkció, előfordulhat, hogy nem működik megbízhatóan</string>
+    <string name="pref_software_codecs_enabled">Használjon szoftveres kodekeket</string>
+    <string name="pref_software_codecs_enabled_description">Néhány szoftveralapú megvalósítás ronthatja a teljesítményt. A beállítás letiltása nagyobb valószínűséggel okoz átkódolást.</string>
 </resources>
