@@ -2,6 +2,7 @@ package org.jellyfin.androidtv
 
 import android.app.Application
 import android.content.Context
+import com.tencent.bugly.crashreport.CrashReport
 import org.jellyfin.androidtv.telemetry.TelemetryService
 
 class JellyfinApplication : Application() {
