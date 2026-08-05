@@ -79,7 +79,7 @@ fun createDeviceProfile(
 	userPreferences: UserPreferences,
 	serverVersion: ServerVersion,
 ) = createDeviceProfile(
-	mediaTest = MediaCodecCapabilitiesTest(context, userPreferences[UserPreferences.softwareCodecsEnabled]),
+	mediaTest = MediaCodecCapabilitiesTest(userPreferences[UserPreferences.softwareCodecsEnabled]),
 	maxBitrate = userPreferences.getMaxBitrate(),
 	isAC3Enabled = userPreferences[UserPreferences.ac3Enabled],
 	downMixAudio = userPreferences[UserPreferences.audioBehaviour] == AudioBehavior.DOWNMIX_TO_STEREO,
@@ -448,8 +448,18 @@ fun createDeviceProfile(
 		add(VideoRangeType.DOVI_INVALID)
 
 		if (!supportsHevcDolbyVisionEL) {
-			add(VideoRangeType.DOVI_WITH_EL)
-			if (!supportsHevcHDR10Plus && !KnownDefects.hevcDoviHdr10PlusBug) add(VideoRangeType.DOVI_WITH_ELHDR10_PLUS)
+			if (
+				!KnownDefects.unreportedDoviProfile7Support ||
+				!supportsHevcDolbyVision ||
+				!supportsHevcMain10 ||
+				!supportsHevcHDR10
+			) {
+				add(VideoRangeType.DOVI_WITH_EL)
+
+				if (!supportsHevcHDR10Plus && !KnownDefects.hevcDoviHdr10PlusBug) {
+					add(VideoRangeType.DOVI_WITH_ELHDR10_PLUS)
+				}
+			}
 
 			if (!supportsHevcDolbyVision) {
 				add(VideoRangeType.DOVI)
