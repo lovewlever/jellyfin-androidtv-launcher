@@ -187,6 +187,13 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_getCacheWeather(JNIEnv *env, j
     try
     {
         const auto weatherFile = Constants::getMobilePackageCacheDirPath() + "/weather_cache.json";
+        // 1. 先检查文件是否存在
+        std::ifstream fs(weatherFile);
+        if (!fs.is_open()) {
+            GLog::logD("JNICommon", "weather_cache.json file does not exist");
+            return nullptr;
+        }
+
         std::unique_ptr<std::fstream> fsPtr{nullptr};
         std::ostringstream bufStream{};
         fsPtr = std::make_unique<std::fstream>(weatherFile, std::ios::in);
@@ -198,16 +205,24 @@ Java_org_jellyfin_androidtv_ui_gqcustom_JNICommon_getCacheWeather(JNIEnv *env, j
         GLog::logD("JNICommon", oss.str().c_str());
 
         const auto jsonObj = nlohmann::json::parse(bufStream.str());
+        if (jsonObj.is_discarded() || !jsonObj.is_object()) {
+            GLog::logE("JNICommon", "Invalid JSON format in weather_cache.json");
+            return nullptr;
+        }
 
-        const auto city = jsonObj["city"].get<std::string>();
-        const auto weather = jsonObj["weather"].get<std::string>();
-        const auto temperature = jsonObj["temperature"].get<std::string>();
-        const auto temperatureFloat = jsonObj["temperatureFloat"].get<std::string>();
-        const auto humidity = jsonObj["humidity"].get<std::string>();
-        const auto humidityFloat = jsonObj["humidityFloat"].get<std::string>();
-        const auto winddirection = jsonObj["winddirection"].get<std::string>();
-        const auto windpower = jsonObj["windpower"].get<std::string>();
-        const auto reporttime = jsonObj["reporttime"].get<std::string>();
+        const auto city = jsonObj.value("city", "");
+        const auto weather = jsonObj.value("weather", "");
+        const auto temperature = jsonObj.value("temperature", "");
+        const auto temperatureFloat = jsonObj.value("temperatureFloat", "");
+        const auto humidity = jsonObj.value("humidity", "");
+        const auto humidityFloat = jsonObj.value("humidityFloat", "");
+        const auto winddirection = jsonObj.value("winddirection", "");
+        const auto windpower = jsonObj.value("windpower", "");
+        const auto reporttime = jsonObj.value("reporttime", "");
+
+        if (weather.empty() && temperature.empty()) {
+            return nullptr;
+        }
 
         const auto weatherClass = env->FindClass("org/jellyfin/androidtv/ui/gqcustom/GQWeatherData");
         const auto consMethodId = env->GetMethodID(weatherClass, "<init>", "()V");
