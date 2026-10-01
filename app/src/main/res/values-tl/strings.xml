@@ -37,4 +37,5 @@
     <string name="lbl_other">Iba</string>
     <string name="because_you_watched">Dahil napanood mo %1$s</string>
     <string name="lbl_series">Serye</string>
+    <string name="lbl_favorite">Paborito</string>
 </resources>
